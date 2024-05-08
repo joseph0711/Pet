@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.pet.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_monitor"
+        android:name="com.example.pet.ui.monitor.MonitorFragment"
+        android:label="@string/title_monitor"
+        tools:layout="@layout/fragment_monitor" />
+
+    <fragment
+        android:id="@+id/navigation_feed"
+        android:name="com.example.pet.ui.feed.FeedFragment"
+        android:label="@string/title_feed"
+        tools:layout="@layout/fragment_feed" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.pet.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+    <fragment
+        android:id="@+id/navigation_healthcare"
+        android:name="com.example.pet.ui.healthcare.HealthCareFragment"
+        android:label="@string/title_HealthCare"
+        tools:layout="@layout/fragment_health_care" />
+    <fragment
+        android:id="@+id/feedManualFragment"
+        android:name="com.example.pet.ui.feedmanual.FeedManualFragment"
+        android:label="fragment_feed_manual"
+        tools:layout="@layout/fragment_feed_manual" />
+
+</navigation>
