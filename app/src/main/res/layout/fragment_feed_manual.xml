@@ -5,13 +5,13 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.feedmanual.FeedManualFragment" >
+    tools:context=".ui.feedManual.FeedManualFragment" >
 
     <ImageView
         android:id="@+id/feedManual_imgCat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/cattried"
+        android:src="@drawable/cat_tired"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"

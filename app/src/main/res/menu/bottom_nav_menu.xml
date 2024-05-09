@@ -19,5 +19,9 @@
         android:id="@+id/navigation_healthcare"
         android:icon="@drawable/health_icon"
         android:title="@string/title_HealthCare" />
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/settings_icon"
+        android:title="@string/title_settings" />
 
 </menu>

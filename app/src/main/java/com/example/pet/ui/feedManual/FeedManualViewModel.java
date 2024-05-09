@@ -1,4 +1,4 @@
-package com.example.pet.ui.feedmanual;
+package com.example.pet.ui.feedManual;
 
 import androidx.lifecycle.ViewModel;
 
