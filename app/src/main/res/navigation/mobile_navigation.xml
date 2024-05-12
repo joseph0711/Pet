@@ -23,11 +23,6 @@
         android:label="@string/title_feed"
         tools:layout="@layout/fragment_feed" />
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.pet.ui.login.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
-    <fragment
         android:id="@+id/navigation_healthcare"
         android:name="com.example.pet.ui.healthcare.HealthCareFragment"
         android:label="@string/title_HealthCare"
@@ -48,10 +43,6 @@
         android:label="fragment_feeding"
         tools:layout="@layout/fragment_feeding" />
     <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.pet.SettingsFragment"
-        android:label="SettingsFragment" />
-    <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.pet.ui.register.RegisterFragment"
         android:label="fragment_register"
@@ -61,5 +52,19 @@
         android:name="com.example.pet.ui.petInfo.PetInfoFragment"
         android:label="fragment_pet_info"
         tools:layout="@layout/fragment_pet_info" />
+    <fragment
+        android:id="@+id/monitorLiveFragment"
+        android:name="com.example.pet.ui.monitorLive.MonitorLiveFragment"
+        android:label="fragment_monitor_live"
+        tools:layout="@layout/fragment_monitor_live" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.pet.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.pet.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
 
 </navigation>

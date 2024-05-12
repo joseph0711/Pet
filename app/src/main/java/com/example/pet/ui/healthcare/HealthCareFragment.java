@@ -29,8 +29,7 @@ public class HealthCareFragment extends Fragment {
         binding = FragmentHealthCareBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        //final TextView textView = binding.homeTextTitle;
-        //homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
         return root;
     }
 

@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModel;
 
 import android.util.Patterns;
 
-import com.example.pet.data.LoginRepository;
-import com.example.pet.data.Result;
-import com.example.pet.data.model.LoggedInUser;
 import com.example.pet.R;
+import com.example.pet.ui.data.LoginRepository;
+import com.example.pet.ui.data.Result;
+import com.example.pet.ui.data.model.LoggedInUser;
+
 
 public class LoginViewModel extends ViewModel {
 
