@@ -7,70 +7,109 @@
     android:layout_height="match_parent"
     tools:context=".ui.feedAutomatic.FeedAutomaticFragment" >
 
+
     <ImageView
         android:id="@+id/feedAuto_img01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="248dp"
+        android:layout_height="209dp"
+        android:layout_marginTop="4dp"
         android:src="@drawable/cat_tired"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.046" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/feedAuto_inputTime"
+    <TextView
+        android:id="@+id/feed_textFeedingTimes"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:ems="10"
-        android:inputType="time"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Feeding Times"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedAuto_textTime"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_img01" />
 
     <EditText
-        android:id="@+id/feedAuto_inputDate"
+        android:id="@+id/feed_inputFeedingTimes"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
+        android:layout_marginTop="4dp"
         android:ems="10"
-        android:inputType="date"
+        android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedAuto_textDate"
+        app:layout_constraintTop_toBottomOf="@+id/feed_textFeedingTimes"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
         android:id="@+id/feedAuto_textDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:text="Date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedAuto_img01" />
+        app:layout_constraintTop_toBottomOf="@+id/feed_inputFeedingTimes" />
 
     <TextView
         android:id="@+id/feedAuto_textTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         android:text="Time"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedAuto_inputDate" />
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_textDatePicked" />
 
     <Button
-        android:id="@+id/feedAuto_btnAppointment"
+        android:id="@+id/feedAuto_btnSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:text="Submit"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedAuto_inputTime" />
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_textTimePicked" />
+
+    <Button
+        android:id="@+id/feedAuto_btnDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_textDate" />
+
+    <TextView
+        android:id="@+id/feedAuto_textDatePicked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_btnDate" />
+
+    <Button
+        android:id="@+id/feedAuto_btnTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_textTime" />
+
+    <TextView
+        android:id="@+id/feedAuto_textTimePicked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feedAuto_btnTime" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

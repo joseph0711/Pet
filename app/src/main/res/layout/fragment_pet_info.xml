@@ -11,7 +11,7 @@
         android:id="@+id/petInfo_textTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:text="Enter Pet Information"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,22 +21,22 @@
 
     <TextView
         android:id="@+id/petInfo_textName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="61dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="16dp"
         android:text="Name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/petInfo_textTitle" />
 
     <EditText
         android:id="@+id/petInfo_inputName"
-        android:layout_width="326dp"
+        android:layout_width="314dp"
         android:layout_height="48dp"
-        android:layout_marginStart="60dp"
         android:layout_marginTop="4dp"
         android:ems="10"
         android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/petInfo_textName"
         tools:ignore="SpeakableTextPresentCheck" />
@@ -45,17 +45,18 @@
         android:id="@+id/petInfo_textGender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="24dp"
         android:text="Gender"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/petInfo_inputName" />
 
     <RadioGroup
-        android:id="@+id/petInfo_radioGroup"
-        android:layout_width="287dp"
-        android:layout_height="90dp"
-        android:layout_marginStart="60dp"
+        android:id="@+id/petInfo_radioGenderGroup"
+        android:layout_width="271dp"
+        android:layout_height="88dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.346"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/petInfo_textGender">
 
@@ -76,59 +77,30 @@
         android:id="@+id/petInfo_textBirthDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="24dp"
         android:text="Birth Date"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/petInfo_radioGroup" />
-
-    <EditText
-        android:id="@+id/petInfo_inputBirthDate"
-        android:layout_width="327dp"
-        android:layout_height="53dp"
-        android:layout_marginStart="60dp"
-        android:ems="10"
-        android:inputType="date"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/petInfo_textBirthDate"
-        tools:ignore="SpeakableTextPresentCheck" />
-
-    <TextView
-        android:id="@+id/petInfo_textBreed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="24dp"
-        android:text="Breed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/petInfo_inputBirthDate" />
-
-    <Spinner
-        android:id="@+id/petInfo_spinnerBreed"
-        android:layout_width="328dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/petInfo_textBreed" />
+        app:layout_constraintTop_toBottomOf="@+id/petInfo_radioGenderGroup" />
 
     <TextView
         android:id="@+id/petInfo_textWeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="24dp"
         android:text="Weight"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/petInfo_spinnerBreed" />
+        app:layout_constraintTop_toBottomOf="@+id/petInfo_textAge" />
 
     <EditText
         android:id="@+id/petInfo_inputWeight"
-        android:layout_width="330dp"
+        android:layout_width="315dp"
         android:layout_height="59dp"
-        android:layout_marginStart="60dp"
         android:ems="10"
         android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/petInfo_textWeight"
         tools:ignore="SpeakableTextPresentCheck" />
@@ -142,5 +114,31 @@
         android:text="Confirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/petInfo_inputWeight" />
+
+    <Button
+        android:id="@+id/petInfo_btnDatePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:text="Date Picker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/petInfo_textBirthDate" />
+
+    <TextView
+        android:id="@+id/petInfo_textDatePicked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/petInfo_btnDatePicker" />
+
+    <TextView
+        android:id="@+id/petInfo_textAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/petInfo_textDatePicked" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

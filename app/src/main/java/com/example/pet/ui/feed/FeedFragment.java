@@ -16,16 +16,15 @@ import com.example.pet.ui.feedManual.FeedManualFragment;
 
 public class FeedFragment extends Fragment {
     private FragmentFeedBinding binding;
-    private Button btnManual, btnAutomatic;
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FeedViewModel feedViewModel =
-                new ViewModelProvider(this).get(FeedViewModel.class);
+
         binding = FragmentFeedBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        btnManual = root.findViewById(R.id.feed_btnManual);
-        btnAutomatic = root.findViewById(R.id.feed_btnAutomatic);
+        Button btnManual = root.findViewById(R.id.feed_btnManual);
+        Button btnAutomatic = root.findViewById(R.id.feed_btnAutomatic);
 
         btnManual.setOnClickListener(view -> {
             Fragment fragment = new FeedManualFragment();

@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-
+    implementation("mysql:mysql-connector-java:5.1.49")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.legacy.support.v4)
     implementation(libs.activity)
     implementation(libs.preference)
+    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

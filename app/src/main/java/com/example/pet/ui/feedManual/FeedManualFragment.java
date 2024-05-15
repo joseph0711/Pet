@@ -11,35 +11,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.pet.R;
 import com.example.pet.ui.feeding.FeedingFragment;
-
 public class FeedManualFragment extends Fragment {
-    private FeedManualViewModel feedManualViewModel;
-
+    private EditText editTextInputAmount;
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_feed_manual, container, false);
 
+        // When user clicks the Start button.
+        // Call manualFeed()
+        editTextInputAmount = view.findViewById(R.id.feedManual_inputAmount);
         Button btnStart = view.findViewById(R.id.feedManual_btnStart);
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new FeedingFragment();
-                FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container, fragment).commit();
-            }
-        });
+        btnStart.setOnClickListener(view1 -> manualFeed());
         return view;
     }
 
-    /*
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        feedManualViewModel = new ViewModelProvider(this).get(FeedManualViewModel.class);
-        // TODO: Use the ViewModel
-    }*/
+    private void manualFeed() {
+        int mount;
+        mount = Integer.parseInt(editTextInputAmount.getText().toString());
+
+        // Add: Call Arduino to do feeding function...
+
+        // When send the signal to Arduino successfully, go to FeedingFragment.
+        Fragment fragment = new FeedingFragment();
+        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container, fragment).commit();
+
+
+    }
 }
