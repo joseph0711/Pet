@@ -18,7 +18,6 @@ import com.example.pet.databinding.FragmentHomeBinding;
 import com.example.pet.ui.home.HomeViewModel;
 
 public class HealthCareFragment extends Fragment {
-
     private @NonNull FragmentHealthCareBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -28,8 +27,6 @@ public class HealthCareFragment extends Fragment {
 
         binding = FragmentHealthCareBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-
         return root;
     }
 

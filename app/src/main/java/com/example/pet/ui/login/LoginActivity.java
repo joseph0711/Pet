@@ -101,6 +101,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (con == null) {
                     runOnUiThread(() -> {
                         str = "Error in connection with SQL server";
+                        Log.e("ERROR", str);
                         Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                     });
                 }
