@@ -6,13 +6,13 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,21 +22,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.pet.ConnectionClass;
+import com.example.pet.ConnectionAzureIotHubClass;
+import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.MainActivity;
 import com.example.pet.R;
-import com.example.pet.ui.feed.FeedFragment;
-import com.example.pet.ui.feedManual.FeedManualFragment;
 import com.example.pet.ui.feeding.FeedingFragment;
-import com.example.pet.ui.home.HomeFragment;
-import com.example.pet.ui.login.LoginActivity;
-import com.example.pet.ui.register.RegisterFragment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,7 +39,8 @@ public class FeedAutomaticFragment extends Fragment {
     public static FeedAutomaticFragment newInstance() {
         return new FeedAutomaticFragment();
     }
-    ConnectionClass connectionClass;
+    ConnectionMysqlClass connectionMysqlClass;
+    ConnectionAzureIotHubClass connectionAzureIoTHubClass = new ConnectionAzureIotHubClass();
     Connection con;
     String str;
     private TextView textViewDate, textViewTime;
@@ -95,8 +90,19 @@ public class FeedAutomaticFragment extends Fragment {
         });
 
         // Make a connection to MySQL.
-        connectionClass = new ConnectionClass();
+        connectionMysqlClass = new ConnectionMysqlClass();
         connect();
+
+        // Make a connection to Azure IoT Hub for testing.
+        try
+        {
+            connectionAzureIoTHubClass.ConnectToAzureIoTHub();
+        }
+        catch (Exception e2)
+        {
+            Log.e("ERROR","Exception while opening IoTHub connection");
+            e2.printStackTrace();
+        }
 
         // Make a reservation for automatic feeding mode.
         btnSubmit = view.findViewById(R.id.feedAuto_btnSubmit);
@@ -131,26 +137,29 @@ public class FeedAutomaticFragment extends Fragment {
                 int rowCount = preparedStatement.executeUpdate();
                 if (rowCount > 0) {
                     requireActivity().runOnUiThread(() -> {
-                        // Registration successful
+                        // Reserve successful
                         Toast.makeText(requireActivity(), "Reserved Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(requireActivity(), MainActivity.class);
                         startActivity(intent);
                     });
                 } else {
-                    // Registration failed
+                    // Reserve failed
                     requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Reserved Failed. Contact Developer!", Toast.LENGTH_SHORT).show());
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         });
+
+        // Call Arduino to do feeding function via Azure IoT Hub.
+        connectionAzureIoTHubClass.sendMsgToArduino(mount);
     }
 
     public void connect() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
-                con = connectionClass.CONN();
+                con = connectionMysqlClass.CONN();
                 if (con == null) {
                     requireActivity().runOnUiThread(() -> {
                         str = "Error in connection with SQL server";
