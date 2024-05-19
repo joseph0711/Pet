@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pet.ConnectionClass;
+import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.R;
 import com.example.pet.ui.login.LoginActivity;
 
@@ -34,7 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class PetInfoFragment extends Fragment {
-    ConnectionClass connectionClass;
+    ConnectionMysqlClass connectionMysqlClass;
     Connection con;
     String str;
     private EditText petNameEditText, weightEditText;
@@ -104,7 +103,7 @@ public class PetInfoFragment extends Fragment {
         weightEditText = view.findViewById(R.id.petInfo_inputWeight);
 
         // Make a connection to MySQL.
-        connectionClass = new ConnectionClass();
+        connectionMysqlClass = new ConnectionMysqlClass();
         connect();
 
         // Call the petInfoRegister() method when the Confirm button is clicked.
@@ -160,7 +159,7 @@ public class PetInfoFragment extends Fragment {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
-                con = connectionClass.CONN();
+                con = connectionMysqlClass.CONN();
                 if (con == null) {
                     requireActivity().runOnUiThread(() -> {
                         str = "Error in connection with SQL server";

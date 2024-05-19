@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.pet.ConnectionClass;
+import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.databinding.ActivityLoginBinding;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
-    ConnectionClass connectionClass;
+    ConnectionMysqlClass connectionMysqlClass;
     Connection con;
     String str;
     private Button btnRegister, btnLogin;
@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             fragmentTransaction.replace(R.id.container, fragment).commit();
         });
 
-        connectionClass = new ConnectionClass();
+        connectionMysqlClass = new ConnectionMysqlClass();
         connect();
 
         // Call the loginCheck() method when the Login button is clicked.
@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
-                con = connectionClass.CONN();
+                con = connectionMysqlClass.CONN();
                 if (con == null) {
                     runOnUiThread(() -> {
                         str = "Error in connection with SQL server";

@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.pet.ConnectionClass;
+import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.R;
 import com.example.pet.ui.petInfo.PetInfoFragment;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class RegisterFragment extends Fragment {
-    ConnectionClass connectionClass;
+    ConnectionMysqlClass connectionMysqlClass;
     Connection con;
     String str;
     private EditText nameEditText, emailEditText, passwordEditText;
@@ -42,7 +42,7 @@ public class RegisterFragment extends Fragment {
         passwordEditText = view.findViewById(R.id.register_inputPwd);
         btnSubmit = view.findViewById(R.id.register_btnContinue);
 
-        connectionClass = new ConnectionClass();
+        connectionMysqlClass = new ConnectionMysqlClass();
         connect();
 
         // Call the sendDataToMySQL() method when the Submit button is clicked.
@@ -88,7 +88,7 @@ public class RegisterFragment extends Fragment {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
-                con = connectionClass.CONN();
+                con = connectionMysqlClass.CONN();
                 if (con == null) {
                     requireActivity().runOnUiThread(() -> {
                         str = "Error in connection with SQL server";
