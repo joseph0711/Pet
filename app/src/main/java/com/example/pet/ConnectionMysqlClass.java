@@ -1,12 +1,15 @@
 package com.example.pet;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class ConnectionClass {
+public class ConnectionMysqlClass {
     protected static String dp = "petassistant";
     protected static String ip = "petassistant.mysql.database.azure.com";
     protected static String port = "3306";
