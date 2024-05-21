@@ -37,6 +37,7 @@ android {
 dependencies {
     implementation("mysql:mysql-connector-java:5.1.49")
     implementation("com.microsoft.azure.sdk.iot:iot-device-client:2.5.0")
+    implementation("androidx.webkit:webkit:1.8.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
