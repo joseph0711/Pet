@@ -66,10 +66,5 @@
         android:name="com.example.pet.ui.login.LoginActivity"
         android:label="activity_login"
         tools:layout="@layout/activity_login" />
-    <fragment
-        android:id="@+id/healthResultFragment"
-        android:name="com.example.pet.ui.healthResult.HealthResultFragment"
-        android:label="fragment_health_result"
-        tools:layout="@layout/fragment_health_result" />
 
 </navigation>
