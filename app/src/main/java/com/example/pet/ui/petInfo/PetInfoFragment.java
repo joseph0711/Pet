@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +23,12 @@ import android.widget.Toast;
 
 import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.R;
+import com.example.pet.UserClass;
 import com.example.pet.ui.login.LoginActivity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Calendar;
@@ -34,6 +37,7 @@ import java.util.concurrent.Executors;
 
 public class PetInfoFragment extends Fragment {
     ConnectionMysqlClass connectionMysqlClass;
+    UserClass userClass;
     Connection con;
     String str;
     private EditText petNameEditText, weightEditText;
@@ -113,8 +117,11 @@ public class PetInfoFragment extends Fragment {
     }
 
     private void petInfoRegister() {
+        findUserById(); // Find the user id by the created date and time.
+        Log.i("info", "Executed findUserById() method." + "\n id: " + userClass.id);
+
         String petName, birthDate, gender;
-        int age, weight;
+        int age, weight, id;
         petName = petNameEditText.getText().toString();
         birthDate = userInputDate;
         weight = Integer.parseInt(weightEditText.getText().toString());
@@ -125,17 +132,18 @@ public class PetInfoFragment extends Fragment {
             age = 0;
         }
 
-        String sql = "INSERT INTO pet (Name, Weight, Age, BirthDate, Gender) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO pet (id, Name, Weight, Age, BirthDate, Gender) VALUES (?, ?, ?, ?, ?, ?);";
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
-                preparedStatement.setString(1, petName);
-                preparedStatement.setInt(2, weight);
-                preparedStatement.setInt(3, age);
-                preparedStatement.setString(4, birthDate);
-                preparedStatement.setString(5, gender);
+                preparedStatement.setInt(1, userClass.id);
+                preparedStatement.setString(2, petName);
+                preparedStatement.setInt(3, weight);
+                preparedStatement.setInt(4, age);
+                preparedStatement.setString(5, birthDate);
+                preparedStatement.setString(6, gender);
 
                 int rowCount = preparedStatement.executeUpdate();
                 if (rowCount > 0) {
@@ -148,6 +156,26 @@ public class PetInfoFragment extends Fragment {
                 } else {
                     // Registration failed
                     requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Pet Registration failed. Contact Developer!", Toast.LENGTH_SHORT).show());
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
+    //TODO: Fix the bug which causes the user id to be 0.（findUserByID bug待處理）
+    private void findUserById() {
+        userClass = new UserClass();
+        String sql = "SELECT id FROM user WHERE (Created) = (?);";
+        ExecutorService executionService = Executors.newSingleThreadExecutor();
+        executionService.execute(() -> {
+            try {
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                preparedStatement.setString(1, userClass.createdDateTime);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userClass.id = resultSet.getInt("id");
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
