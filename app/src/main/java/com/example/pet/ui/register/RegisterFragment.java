@@ -42,7 +42,7 @@ public class RegisterFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
-        nameEditText = view.findViewById(R.id.changeUserInfo_inputName);
+        nameEditText = view.findViewById(R.id.register_inputName);
         emailEditText = view.findViewById(R.id.register_inputEmail);
         passwordEditText = view.findViewById(R.id.register_inputPwd);
         btnSubmit = view.findViewById(R.id.register_btnContinue);
@@ -72,7 +72,7 @@ public class RegisterFragment extends Fragment {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
-                PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, email);
                 preparedStatement.setString(3, password);
@@ -96,8 +96,6 @@ public class RegisterFragment extends Fragment {
             }
         });
     }
-
-
 
     private void connect() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
