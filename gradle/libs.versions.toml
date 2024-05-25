@@ -15,6 +15,7 @@ legacySupportV4 = "1.0.0"
 activity = "1.9.0"
 preference = "1.2.0"
 firebaseInappmessaging = "21.0.0"
+supportV4 = "29.0.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -32,6 +33,7 @@ legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", ver
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
+support-v4 = { group = "com.android.support", name = "support-v4", version.ref = "supportV4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
