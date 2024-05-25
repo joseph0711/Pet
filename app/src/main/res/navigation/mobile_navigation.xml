@@ -57,14 +57,20 @@
         android:name="com.example.pet.ui.monitorLive.MonitorLiveFragment"
         android:label="fragment_monitor_live"
         tools:layout="@layout/fragment_monitor_live" />
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.pet.ui.settings.SettingsFragment"
-        android:label="SettingsFragment" />
     <activity
         android:id="@+id/loginActivity"
         android:name="com.example.pet.ui.login.LoginActivity"
         android:label="activity_login"
         tools:layout="@layout/activity_login" />
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.example.pet.ui.settings.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/changeUserInfoFragment"
+        android:name="com.example.pet.ui.changeUserInfo.ChangeUserInfoFragment"
+        android:label="fragment_change_user_info"
+        tools:layout="@layout/fragment_change_user_info" />
 
 </navigation>
