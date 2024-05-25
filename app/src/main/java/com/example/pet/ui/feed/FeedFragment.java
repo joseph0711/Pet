@@ -8,7 +8,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
 import com.example.pet.R;
 import com.example.pet.databinding.FragmentFeedBinding;
 import com.example.pet.ui.feedAutomatic.FeedAutomaticFragment;
@@ -19,7 +18,6 @@ public class FeedFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         binding = FragmentFeedBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 

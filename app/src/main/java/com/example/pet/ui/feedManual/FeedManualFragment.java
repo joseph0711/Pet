@@ -1,28 +1,26 @@
 package com.example.pet.ui.feedManual;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
-
-import com.example.pet.ConnectionAzureIotHubClass;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import com.example.pet.MqttHandler;
 import com.example.pet.ConnectionMysqlClass;
-import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.ui.feeding.FeedingFragment;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,11 +31,14 @@ import java.util.concurrent.Executors;
 
 public class FeedManualFragment extends Fragment {
     ConnectionMysqlClass connectionMysqlClass;
+    MqttHandler mqttHandler;
     Connection con;
     String str;
-    private EditText editTextInputAmount;
-    ConnectionAzureIotHubClass connectionAzureIoTHubClass = new ConnectionAzureIotHubClass();
+    private EditText editTextInputWeight;
+    private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
+    private static final String CLIENT_ID = "test01";
 
+    @SuppressLint("MissingInflatedId")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
@@ -45,31 +46,31 @@ public class FeedManualFragment extends Fragment {
 
         // Make a connection to MySQL.
         connectionMysqlClass = new ConnectionMysqlClass();
-        connect();
+        connectMysql();
 
-        // Make a connection to Azure IoT Hub for testing.
-        try
-        {
-            connectionAzureIoTHubClass.ConnectToAzureIoTHub();
-        }
-        catch (Exception e2)
-        {
-            Log.e("ERROR","Exception while opening IoTHub connection");
-            e2.printStackTrace();
-        }
+        // Make a MQTT broker connection.
+        mqttHandler = new MqttHandler();
+        mqttHandler.connect(BROKER_URL, CLIENT_ID);
 
         // When user clicks the Start button.
         // Call manualFeed()
-        editTextInputAmount = view.findViewById(R.id.feedManual_inputAmount);
+        editTextInputWeight = view.findViewById(R.id.feedManual_inputWeight);
         Button btnStart = view.findViewById(R.id.feedManual_btnStart);
-        btnStart.setOnClickListener(view1 -> manualFeed());
+        btnStart.setOnClickListener(view1 -> {
+            try {
+                manualFeed();
+            } catch (MqttException | JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return view;
     }
 
-    private void manualFeed() {
-        int mount;
-        mount = Integer.parseInt(editTextInputAmount.getText().toString());
+    private void manualFeed() throws MqttException, JSONException {
+        int weight;
+        weight = Integer.parseInt(editTextInputWeight.getText().toString());
 
+        // Set date and time to currentDateString, currentDate and currentTime.
         Calendar calendar = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
@@ -78,13 +79,14 @@ public class FeedManualFragment extends Fragment {
         String currentDate = dateFormat2.format(calendar.getTime());
         String currentTime = dateFormat3.format(calendar.getTime());
 
+        // Insert data and send to the database.
         String sql = "INSERT INTO feeding (Mode, Mount, ReservedDate, ReservedTime, Created) VALUES (?, ?, ?, ?, ?);";
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setString(1, "Manual");
-                preparedStatement.setInt(2, mount);
+                preparedStatement.setInt(2, weight);
                 preparedStatement.setString(3, currentDate);
                 preparedStatement.setString(4, currentTime);
                 preparedStatement.setString(5, currentDateString);
@@ -94,8 +96,6 @@ public class FeedManualFragment extends Fragment {
                     requireActivity().runOnUiThread(() -> {
                         // Reserve successful
                         Toast.makeText(requireActivity(), "Reserved Successfully", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(requireActivity(), MainActivity.class);
-                        startActivity(intent);
                     });
                 } else {
                     // Reserve failed
@@ -106,16 +106,21 @@ public class FeedManualFragment extends Fragment {
             }
         });
 
-        // Call Arduino to do feeding function via Azure IoT Hub.
-        connectionAzureIoTHubClass.sendMsgToArduino(mount);
+        // Create JSON format message.
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("feedingweight", weight);
 
-        // When send the signal to Arduino successfully, go to FeedingFragment.
-        Fragment fragment = new FeedingFragment();
-        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, fragment).commit();
+        // Publish the message to the topic "feeding_amount"
+        publishMessage(jsonObject);
+
+        // TODO: Fix the bug which caused the app to crash when the user clicked the Start button. (轉換到 FeedingFragment 造成的crush bug待處理
+        // Might be due to the fragment transaction.
+//        Fragment fragment = new FeedingFragment();
+//        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
+//        fragmentTransaction.replace(R.id.container, fragment).commit();
     }
 
-    public void connect() {
+    public void connectMysql() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
@@ -130,5 +135,10 @@ public class FeedManualFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    private void publishMessage(JSONObject message) {
+        Toast.makeText(this.getContext(), "Publishing message: " + message, Toast.LENGTH_SHORT).show();
+        mqttHandler.publish("pet/feed/weight", message);
     }
 }

@@ -22,11 +22,17 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.pet.ConnectionAzureIotHubClass;
 import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.ui.feeding.FeedingFragment;
+
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +46,6 @@ public class FeedAutomaticFragment extends Fragment {
         return new FeedAutomaticFragment();
     }
     ConnectionMysqlClass connectionMysqlClass;
-    ConnectionAzureIotHubClass connectionAzureIoTHubClass = new ConnectionAzureIotHubClass();
     Connection con;
     String str;
     private TextView textViewDate, textViewTime;
@@ -89,29 +94,20 @@ public class FeedAutomaticFragment extends Fragment {
             timePickerDialog.show();
         });
 
+        //btnTimeDialog.setOnEditorActionListener();
+
         // Make a connection to MySQL.
         connectionMysqlClass = new ConnectionMysqlClass();
-        connect();
+        connectMysql();
 
-        // Make a connection to Azure IoT Hub for testing.
-        try
-        {
-            connectionAzureIoTHubClass.ConnectToAzureIoTHub();
-        }
-        catch (Exception e2)
-        {
-            Log.e("ERROR","Exception while opening IoTHub connection");
-            e2.printStackTrace();
-        }
+        // Test for MQTT broker connection.
+        connectMqttBroker();
 
         // Make a reservation for automatic feeding mode.
         btnSubmit = view.findViewById(R.id.feedAuto_btnSubmit);
         editTextAmount = view.findViewById(R.id.feedAuto_inputAmount);
         btnSubmit.setOnClickListener(view1 -> {
             autoFeed();
-            Fragment fragment = new FeedingFragment();
-            FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.container, fragment).commit();
         });
         return view;
     }
@@ -151,11 +147,13 @@ public class FeedAutomaticFragment extends Fragment {
             }
         });
 
-        // Call Arduino to do feeding function via Azure IoT Hub.
-        connectionAzureIoTHubClass.sendMsgToArduino(mount);
+        // Send JSON to MQTT broker.
+        // connectMqttbroker();
+
+
     }
 
-    public void connect() {
+    public void connectMysql() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
@@ -170,5 +168,32 @@ public class FeedAutomaticFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    private void connectMqttBroker() {
+        String clientId = MqttClient.generateClientId();
+        MqttAndroidClient client =
+                new MqttAndroidClient(this.getContext(), "tcp://feeding_textTitle.mosquitto.org:1883",
+                        clientId);
+
+        try {
+            IMqttToken token = client.connect();
+            token.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    // We are connected
+                    Log.i("INFO", "onSuccess");
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    // Something went wrong e.g. connection timeout or firewall problems
+                    Log.d("Debug msg", "onFailure");
+
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
     }
 }
