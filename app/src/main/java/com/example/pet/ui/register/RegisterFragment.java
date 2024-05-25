@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,16 +33,22 @@ import java.util.concurrent.Executors;
 
 public class RegisterFragment extends Fragment {
     ConnectionMysqlClass connectionMysqlClass;
-    UserClass userClass;
     Connection con;
     String str;
     private EditText nameEditText, emailEditText, passwordEditText;
     private Button btnSubmit;
+    private RegisterViewModel registerViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
+
+        // Get the view model.
+        registerViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.NewInstanceFactory()).get(RegisterViewModel.class);
+
         nameEditText = view.findViewById(R.id.register_inputName);
         emailEditText = view.findViewById(R.id.register_inputEmail);
         passwordEditText = view.findViewById(R.id.register_inputPwd);
@@ -56,13 +63,12 @@ public class RegisterFragment extends Fragment {
     }
 
     private void register() {
-        userClass = new UserClass();
-        String name, email, password;
+        String name, email, password, createdDateTime;
 
         // Get the current date and time and store it in the createdDateTime variable.
         Calendar calendar = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        userClass.createdDateTime = dateFormat.format(calendar.getTime());
+        createdDateTime = dateFormat.format(calendar.getTime());
 
         name = nameEditText.getText().toString();
         email = emailEditText.getText().toString();
@@ -76,7 +82,7 @@ public class RegisterFragment extends Fragment {
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, email);
                 preparedStatement.setString(3, password);
-                preparedStatement.setString(4, userClass.createdDateTime);
+                preparedStatement.setString(4, createdDateTime);
 
                 int rowCount = preparedStatement.executeUpdate();
                 if (rowCount > 0) {
@@ -95,6 +101,13 @@ public class RegisterFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+
+        // Set the created date and time in the UserClass object.
+        UserClass userClass = new UserClass();
+        userClass.setCreatedDateTime(createdDateTime);
+
+        // Then, Set the UserClass object from UserClass in the ViewModel.
+        registerViewModel.setUserClass(userClass);
     }
 
     private void connect() {

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.R;
 import com.example.pet.UserClass;
 import com.example.pet.ui.login.LoginActivity;
+import com.example.pet.ui.register.RegisterViewModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,12 +34,14 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class PetInfoFragment extends Fragment {
+    private RegisterViewModel registerViewModel;
     ConnectionMysqlClass connectionMysqlClass;
-    UserClass userClass;
+    UserClass userClass = new UserClass();
     Connection con;
     String str;
     private EditText petNameEditText, weightEditText;
@@ -47,14 +51,14 @@ public class PetInfoFragment extends Fragment {
     int day, month, year;
     String userInputDate;
     Period period;
-    public static PetInfoFragment newInstance() {
-        return new PetInfoFragment();
-    }
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pet_info, container, false);
+
+        // Get the view model.
+        registerViewModel = new ViewModelProvider(requireActivity()).get(RegisterViewModel.class);
 
         // Get the value from the radio button in radio group.
         RadioGroup radioGenderGroup = view.findViewById(R.id.petInfo_radioGenderGroup);
@@ -112,16 +116,19 @@ public class PetInfoFragment extends Fragment {
 
         // Call the petInfoRegister() method when the Confirm button is clicked.
         btnConfirm = view.findViewById(R.id.petInfo_btnConfirm);
+
+        //Using viewmodel to catch the data from Register fragment.
+        registerViewModel.getUserClass().observe(getViewLifecycleOwner(), item -> Log.i("viewmodel", item.getCreatedDateTime()));
+
         btnConfirm.setOnClickListener( view2 -> petInfoRegister());
         return view;
     }
 
     private void petInfoRegister() {
         findUserById(); // Find the user id by the created date and time.
-        Log.i("info", "Executed findUserById() method." + "\n id: " + userClass.id);
 
         String petName, birthDate, gender;
-        int age, weight, id;
+        int age, weight;
         petName = petNameEditText.getText().toString();
         birthDate = userInputDate;
         weight = Integer.parseInt(weightEditText.getText().toString());
@@ -163,15 +170,15 @@ public class PetInfoFragment extends Fragment {
         });
     }
 
-    //TODO: Fix the bug which causes the user id to be 0.（findUserByID bug待處理）
     private void findUserById() {
-        userClass = new UserClass();
-        String sql = "SELECT id FROM user WHERE (Created) = (?);";
+        String sql = "SELECT id FROM user WHERE Created = ?;";
+        String createdDateTime = Objects.requireNonNull(registerViewModel.getUserClass().getValue()).createdDateTime;
+
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
-                preparedStatement.setString(1, userClass.createdDateTime);
+                preparedStatement.setString(1, createdDateTime);
 
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
