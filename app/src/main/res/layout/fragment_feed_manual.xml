@@ -20,11 +20,11 @@
         app:layout_constraintVertical_bias="0.033" />
 
     <TextView
-        android:id="@+id/feedManual_textAmount"
+        android:id="@+id/feedManual_textWeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
-        android:text="Feeding Amount"
+        android:text="Feeding Weight"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,16 +39,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedManual_inputAmount" />
+        app:layout_constraintTop_toBottomOf="@+id/feedManual_inputWeight" />
 
     <EditText
-        android:id="@+id/feedManual_inputAmount"
+        android:id="@+id/feedManual_inputWeight"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:ems="10"
         android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedManual_textAmount"
+        app:layout_constraintTop_toBottomOf="@+id/feedManual_textWeight"
         tools:ignore="SpeakableTextPresentCheck"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
