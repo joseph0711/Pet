@@ -13,7 +13,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // TODO: Understand what's the meaning of line 17.
+        testInstrumentationRunner = "androidx.feeding_textTitle.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -36,8 +37,10 @@ android {
 
 dependencies {
     implementation("mysql:mysql-connector-java:5.1.49")
-    implementation("com.microsoft.azure.sdk.iot:iot-device-client:2.5.0")
     implementation("androidx.webkit:webkit:1.8.0")
+    implementation ("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+    implementation ("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
+    implementation ("com.google.code.gson:gson:2.8.6")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
