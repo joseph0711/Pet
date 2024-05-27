@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -57,6 +58,8 @@ public class FeedAutomaticFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feed_automatic, container, false);
+
+
 
         // Set the date picker for the Date.
         Button btnDateDialog = view.findViewById(R.id.feedAuto_btnDate);
@@ -106,8 +109,11 @@ public class FeedAutomaticFragment extends Fragment {
         // Make a reservation for automatic feeding mode.
         btnSubmit = view.findViewById(R.id.feedAuto_btnSubmit);
         editTextAmount = view.findViewById(R.id.feedAuto_inputAmount);
-        btnSubmit.setOnClickListener(view1 -> {
-            autoFeed();
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                autoFeed();
+            }
         });
         return view;
     }

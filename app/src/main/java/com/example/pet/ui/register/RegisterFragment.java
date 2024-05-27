@@ -1,20 +1,28 @@
 package com.example.pet.ui.register;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.app.Activity;
+import android.Manifest;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.pet.ConnectionMysqlClass;
@@ -24,8 +32,6 @@ import com.example.pet.ui.petInfo.PetInfoFragment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
@@ -34,10 +40,12 @@ import java.util.concurrent.Executors;
 public class RegisterFragment extends Fragment {
     ConnectionMysqlClass connectionMysqlClass;
     Connection con;
-    String str;
+    String str; // put into local variable.
     private EditText nameEditText, emailEditText, passwordEditText;
-    private Button btnSubmit;
+    private ImageView registerAvatar;
     private RegisterViewModel registerViewModel;
+    ActivityResultLauncher<Intent> resultLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -49,10 +57,21 @@ public class RegisterFragment extends Fragment {
                 requireActivity(),
                 new ViewModelProvider.NewInstanceFactory()).get(RegisterViewModel.class);
 
+        // Call the photo picker when user clicks on the avatar.
+        registerAvatar = view.findViewById(R.id.register_imgAvatar);
+        registerAvatar.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "Pick Image", Toast.LENGTH_SHORT).show();
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                pickImage();
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        });
+
         nameEditText = view.findViewById(R.id.register_inputName);
         emailEditText = view.findViewById(R.id.register_inputEmail);
         passwordEditText = view.findViewById(R.id.register_inputPwd);
-        btnSubmit = view.findViewById(R.id.register_btnContinue);
+        Button btnSubmit = view.findViewById(R.id.register_btnContinue);
 
         connectionMysqlClass = new ConnectionMysqlClass();
         connect();
@@ -62,6 +81,36 @@ public class RegisterFragment extends Fragment {
         return view;
     }
 
+    // Request permission to pick image from gallery.
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Check for permission to read external storage.
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                pickImage();
+            } else {
+                Toast.makeText(requireContext(), "Permission required to pick image", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Initialize the ActivityResultLauncher instance for handling the result of an activity that is started for a result.
+        resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Uri imageUri = result.getData().getData();
+                registerAvatar.setImageURI(imageUri);
+            }
+        });
+    }
+
+    // Pick image from gallery.
+    private void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        resultLauncher.launch(intent);
+    }
+
+    // Register the user.
     private void register() {
         String name, email, password, createdDateTime;
 
@@ -110,6 +159,7 @@ public class RegisterFragment extends Fragment {
         registerViewModel.setUserClass(userClass);
     }
 
+    // Connect to the MySQL database.
     private void connect() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
