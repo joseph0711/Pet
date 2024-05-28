@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,8 +37,9 @@ import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.R;
 import com.example.pet.UserClass;
 import com.example.pet.ui.login.LoginActivity;
-import com.example.pet.ui.register.RegisterViewModel;
+import com.example.pet.SharedViewModel;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,7 +51,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class PetInfoFragment extends Fragment {
-    private RegisterViewModel registerViewModel;
+    private SharedViewModel sharedViewModel;
     ConnectionMysqlClass connectionMysqlClass;
     UserClass userClass = new UserClass();
     Connection con;
@@ -70,7 +73,7 @@ public class PetInfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_pet_info, container, false);
 
         // Get the view model.
-        registerViewModel = new ViewModelProvider(requireActivity()).get(RegisterViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         // Call the photo picker when user clicks on the avatar.
         petInfoAvatar = view.findViewById(R.id.petInfo_imgAvatar);
@@ -140,8 +143,8 @@ public class PetInfoFragment extends Fragment {
         // Call the petInfoRegister() method when the Confirm button is clicked.
         btnConfirm = view.findViewById(R.id.petInfo_btnConfirm);
 
-        //Using viewmodel to catch the data from Register fragment.
-        registerViewModel.getUserClass().observe(getViewLifecycleOwner(), item -> Log.i("viewmodel", item.getCreatedDateTime()));
+        // Using viewmodel to catch the data from Register fragment.
+        sharedViewModel.getUserClass().observe(getViewLifecycleOwner(), item -> Log.i("viewmodel", item.getCreatedDateTime()));
 
         btnConfirm.setOnClickListener( view2 -> petInfoRegister());
         return view;
@@ -177,9 +180,10 @@ public class PetInfoFragment extends Fragment {
     }
 
     private void petInfoRegister() {
-        findUserById(); // Find the user id by the created date and time.
+        findUserByCreated(); // Find the user id by the created date and time.
 
         String petName, birthDate, gender;
+        byte[] imageBytes;
         int age, weight;
         petName = petNameEditText.getText().toString();
         birthDate = userInputDate;
@@ -191,7 +195,13 @@ public class PetInfoFragment extends Fragment {
             age = 0;
         }
 
-        String sql = "INSERT INTO pet (id, Name, Weight, Age, BirthDate, Gender) VALUES (?, ?, ?, ?, ?, ?);";
+        // Convert the image to a byte array.
+        Bitmap bitmap = ((BitmapDrawable) petInfoAvatar.getDrawable()).getBitmap();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        imageBytes = outputStream.toByteArray();
+
+        String sql = "INSERT INTO pet (id, Name, Weight, Age, BirthDate, Gender, Image) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
@@ -203,6 +213,7 @@ public class PetInfoFragment extends Fragment {
                 preparedStatement.setInt(4, age);
                 preparedStatement.setString(5, birthDate);
                 preparedStatement.setString(6, gender);
+                preparedStatement.setBytes(7, imageBytes);
 
                 int rowCount = preparedStatement.executeUpdate();
                 if (rowCount > 0) {
@@ -222,9 +233,9 @@ public class PetInfoFragment extends Fragment {
         });
     }
 
-    private void findUserById() {
+    private void findUserByCreated() {
         String sql = "SELECT id FROM user WHERE Created = ?;";
-        String createdDateTime = Objects.requireNonNull(registerViewModel.getUserClass().getValue()).createdDateTime;
+        String createdDateTime = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).createdDateTime;
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {

@@ -3,6 +3,8 @@ package com.example.pet.ui.register;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.app.Activity;
 import android.Manifest;
@@ -27,9 +29,11 @@ import android.widget.Toast;
 
 import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.R;
+import com.example.pet.SharedViewModel;
 import com.example.pet.UserClass;
 import com.example.pet.ui.petInfo.PetInfoFragment;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
@@ -43,7 +47,7 @@ public class RegisterFragment extends Fragment {
     String str; // put into local variable.
     private EditText nameEditText, emailEditText, passwordEditText;
     private ImageView registerAvatar;
-    private RegisterViewModel registerViewModel;
+    private SharedViewModel sharedViewModel;
     ActivityResultLauncher<Intent> resultLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
@@ -53,9 +57,9 @@ public class RegisterFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
 
         // Get the view model.
-        registerViewModel = new ViewModelProvider(
+        sharedViewModel = new ViewModelProvider(
                 requireActivity(),
-                new ViewModelProvider.NewInstanceFactory()).get(RegisterViewModel.class);
+                new ViewModelProvider.NewInstanceFactory()).get(SharedViewModel.class);
 
         // Call the photo picker when user clicks on the avatar.
         registerAvatar = view.findViewById(R.id.register_imgAvatar);
@@ -113,6 +117,7 @@ public class RegisterFragment extends Fragment {
     // Register the user.
     private void register() {
         String name, email, password, createdDateTime;
+        byte[] imageBytes;
 
         // Get the current date and time and store it in the createdDateTime variable.
         Calendar calendar = Calendar.getInstance();
@@ -122,7 +127,14 @@ public class RegisterFragment extends Fragment {
         name = nameEditText.getText().toString();
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
-        String sql = "INSERT INTO user (Name, Email, Password, Created) VALUES (?, ?, ?, ?);";
+
+        // Convert the image to a byte array.
+        Bitmap bitmap = ((BitmapDrawable) registerAvatar.getDrawable()).getBitmap();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        imageBytes = outputStream.toByteArray();
+
+        String sql = "INSERT INTO user (Name, Email, Password, Created, Image) VALUES (?, ?, ?, ?, ?);";
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
@@ -132,6 +144,7 @@ public class RegisterFragment extends Fragment {
                 preparedStatement.setString(2, email);
                 preparedStatement.setString(3, password);
                 preparedStatement.setString(4, createdDateTime);
+                preparedStatement.setBytes(5, imageBytes);
 
                 int rowCount = preparedStatement.executeUpdate();
                 if (rowCount > 0) {
@@ -156,7 +169,7 @@ public class RegisterFragment extends Fragment {
         userClass.setCreatedDateTime(createdDateTime);
 
         // Then, Set the UserClass object from UserClass in the ViewModel.
-        registerViewModel.setUserClass(userClass);
+        sharedViewModel.setUserClass(userClass);
     }
 
     // Connect to the MySQL database.
