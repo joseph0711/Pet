@@ -3,8 +3,10 @@ package com.example.pet.ui.login;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,8 +16,10 @@ import android.widget.Toast;
 import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.MainActivity;
 import com.example.pet.R;
+import com.example.pet.UserClass;
 import com.example.pet.databinding.ActivityLoginBinding;
 import com.example.pet.ui.register.RegisterFragment;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText emailEditText, passwordEditText;
     private TextView loginTextView;
     private String email, password;
+    UserClass userClass = new UserClass();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,9 +81,17 @@ public class LoginActivity extends AppCompatActivity {
                 preparedStatement.setString(2, password);
 
                 ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    // Login successful
+                if (resultSet.next()) { // Login successful
+                    userClass.setName(resultSet.getString("Name"));
+                    userClass.setId(resultSet.getInt("id"));
                     runOnUiThread(() -> {
+                        // Store user's name and id in SharedPreferences
+                        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("name", userClass.getName());
+                        editor.putInt("id", userClass.getId());
+                        editor.apply();
+
                         Toast.makeText(getApplicationContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
