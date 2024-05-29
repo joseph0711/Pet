@@ -52,11 +52,6 @@
         android:name="com.example.pet.ui.petInfo.PetInfoFragment"
         android:label="fragment_pet_info"
         tools:layout="@layout/fragment_pet_info" />
-    <fragment
-        android:id="@+id/monitorLiveFragment"
-        android:name="com.example.pet.ui.monitorLive.MonitorLiveFragment"
-        android:label="fragment_monitor_live"
-        tools:layout="@layout/fragment_monitor_live" />
     <activity
         android:id="@+id/loginActivity"
         android:name="com.example.pet.ui.login.LoginActivity"
