@@ -6,33 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.monitor.MonitorFragment">
 
-    <ImageView
-        android:id="@+id/monitor_imgCat01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="108dp"
-        android:src="@drawable/cat_small"
+    <WebView
+        android:id="@+id/monitorLive_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/monitor_imgCat02"
-        android:layout_width="109dp"
-        android:layout_height="151dp"
-        android:layout_marginTop="248dp"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/cat_happy"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/monitor_btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monitor_imgCat01" />
 </androidx.constraintlayout.widget.ConstraintLayout>
