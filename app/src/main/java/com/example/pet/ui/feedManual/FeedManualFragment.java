@@ -66,7 +66,6 @@ public class FeedManualFragment extends Fragment {
     private void manualFeed() throws MqttException, JSONException {
         int weight = Integer.parseInt(editTextInputWeight.getText().toString());
         int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
-        Log.i("debug msg", "id" + id);
 
         // Set date and time to currentDateString, currentDate and currentTime.
         Calendar calendar = Calendar.getInstance();

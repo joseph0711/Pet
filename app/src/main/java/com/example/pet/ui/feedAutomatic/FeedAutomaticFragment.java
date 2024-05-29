@@ -112,7 +112,6 @@ public class FeedAutomaticFragment extends Fragment {
     private void autoFeed() throws JSONException {
         int weight = Integer.parseInt(editTextAmount.getText().toString());
         int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
-        Log.i("debug msg", "id" + id);
         feedOperationsClass.feed(id,"Auto", weight, reservedDate, reservedTime);
     }
 }
