@@ -1,16 +1,14 @@
 package com.example.pet.ui.feedAutomatic;
 
-import androidx.fragment.app.FragmentTransaction;
-
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,48 +16,39 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import com.example.pet.ConnectionMysqlClass;
-import com.example.pet.MainActivity;
+import com.example.pet.FeedOperationsClass;
 import com.example.pet.R;
-import com.example.pet.ui.feeding.FeedingFragment;
+import com.example.pet.SharedViewModel;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.json.JSONException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Objects;
 
 public class FeedAutomaticFragment extends Fragment {
+    private SharedViewModel sharedViewModel;
     public static FeedAutomaticFragment newInstance() {
         return new FeedAutomaticFragment();
     }
-    ConnectionMysqlClass connectionMysqlClass;
-    Connection con;
-    String str;
     private TextView textViewDate, textViewTime;
     private Button btnSubmit;
     private EditText editTextAmount;
-    int day, month, year, mount;
+    int day, month, year;
     String reservedTime, reservedDate;
+    private FeedOperationsClass feedOperationsClass;
+    private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
+    private static final String CLIENT_ID = "test01";
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feed_automatic, container, false);
 
-
+        // Get the view model.
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         // Set the date picker for the Date.
         Button btnDateDialog = view.findViewById(R.id.feedAuto_btnDate);
@@ -97,14 +86,12 @@ public class FeedAutomaticFragment extends Fragment {
             timePickerDialog.show();
         });
 
-        //btnTimeDialog.setOnEditorActionListener();
-
         // Make a connection to MySQL.
-        connectionMysqlClass = new ConnectionMysqlClass();
-        connectMysql();
+        feedOperationsClass = new FeedOperationsClass();
+        feedOperationsClass.connectMysql();
 
-        // Test for MQTT broker connection.
-        connectMqttBroker();
+        // Make a MQTT broker connection.
+        feedOperationsClass.connectBroker(BROKER_URL, CLIENT_ID);
 
         // Make a reservation for automatic feeding mode.
         btnSubmit = view.findViewById(R.id.feedAuto_btnSubmit);
@@ -112,94 +99,20 @@ public class FeedAutomaticFragment extends Fragment {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                autoFeed();
+                try {
+                    autoFeed();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         return view;
     }
 
-    private void autoFeed() {
-        mount = Integer.parseInt(editTextAmount.getText().toString());
-        String sql = "INSERT INTO feeding (Mode, Mount, ReservedDate, ReservedTime, Created) VALUES (?, ?, ?, ?, ?);";
-
-        Calendar calendar = Calendar.getInstance();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String currentDateString = dateFormat.format(calendar.getTime());
-
-        ExecutorService executionService = Executors.newSingleThreadExecutor();
-        executionService.execute(() -> {
-            try {
-                PreparedStatement preparedStatement = con.prepareStatement(sql);
-                preparedStatement.setString(1, "Auto");
-                preparedStatement.setInt(2, mount);
-                preparedStatement.setString(3, reservedDate);
-                preparedStatement.setString(4, reservedTime);
-                preparedStatement.setString(5, currentDateString);
-
-                int rowCount = preparedStatement.executeUpdate();
-                if (rowCount > 0) {
-                    requireActivity().runOnUiThread(() -> {
-                        // Reserve successful
-                        Toast.makeText(requireActivity(), "Reserved Successfully", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(requireActivity(), MainActivity.class);
-                        startActivity(intent);
-                    });
-                } else {
-                    // Reserve failed
-                    requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Reserved Failed. Contact Developer!", Toast.LENGTH_SHORT).show());
-                }
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        // Send JSON to MQTT broker.
-        // connectMqttbroker();
-
-
-    }
-
-    public void connectMysql() {
-        ExecutorService executionService = Executors.newSingleThreadExecutor();
-        executionService.execute(() -> {
-            try {
-                con = connectionMysqlClass.CONN();
-                if (con == null) {
-                    requireActivity().runOnUiThread(() -> {
-                        str = "Error in connection with SQL server";
-                        Toast.makeText(requireActivity(), str, Toast.LENGTH_SHORT).show();
-                    });
-                }
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-    }
-
-    private void connectMqttBroker() {
-        String clientId = MqttClient.generateClientId();
-        MqttAndroidClient client =
-                new MqttAndroidClient(this.getContext(), "tcp://feeding_textTitle.mosquitto.org:1883",
-                        clientId);
-
-        try {
-            IMqttToken token = client.connect();
-            token.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    // We are connected
-                    Log.i("INFO", "onSuccess");
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    // Something went wrong e.g. connection timeout or firewall problems
-                    Log.d("Debug msg", "onFailure");
-
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+    private void autoFeed() throws JSONException {
+        int weight = Integer.parseInt(editTextAmount.getText().toString());
+        int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
+        Log.i("debug msg", "id" + id);
+        feedOperationsClass.feed(id,"Auto", weight, reservedDate, reservedTime);
     }
 }
