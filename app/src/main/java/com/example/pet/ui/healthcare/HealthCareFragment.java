@@ -29,7 +29,7 @@ public class HealthCareFragment extends Fragment {
         binding = FragmentHealthCareBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        WebView webView = root.findViewById(R.id.webview);
+        WebView webView = root.findViewById(R.id.healthCare_webview);
 
         webView.setInitialScale(1);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -41,8 +41,6 @@ public class HealthCareFragment extends Fragment {
         webView.setWebViewClient(new WebViewClient());
 
         webView.loadUrl("https://joseph0711.github.io/");
-
-
         return root;
     }
 
