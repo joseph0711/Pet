@@ -4,38 +4,36 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.pet.R;
 import com.example.pet.databinding.FragmentMonitorBinding;
-import com.example.pet.ui.feedManual.FeedManualFragment;
-import com.example.pet.ui.monitorLive.MonitorLiveFragment;
+
 
 public class MonitorFragment extends Fragment {
-
-    private Button btnStart;
     private FragmentMonitorBinding binding;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
-        MonitorViewModel monitorViewModel =
-                new ViewModelProvider(this).get(MonitorViewModel.class);
         binding = FragmentMonitorBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        btnStart = root.findViewById(R.id.monitor_btnStart);
-        btnStart.setOnClickListener(view -> {
-            Fragment fragment = new MonitorLiveFragment();
-            FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.container, fragment).commit();
-        });
+        WebView webView = root.findViewById(R.id.monitorLive_webview);
+
+        webView.setInitialScale(1);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setScrollbarFadingEnabled(false);
+        webView.setWebViewClient(new WebViewClient());
+
+        webView.loadUrl("http://20.205.139.170:1880/ui");
+
         return root;
     }
 
