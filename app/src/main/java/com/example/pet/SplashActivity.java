@@ -11,11 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class SplashActivity extends AppCompatActivity {
-
     private Handler handler = new Handler();
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,8 +34,6 @@ public class SplashActivity extends AppCompatActivity {
         }
     };
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -51,6 +45,4 @@ public class SplashActivity extends AppCompatActivity {
         super.onPause();
         handler.removeCallbacks(runnable);
     }
-
-
 }
