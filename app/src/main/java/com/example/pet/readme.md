@@ -8,9 +8,9 @@
     - `./SharedViewModel.java`: Fragment間共享資料
     - `./SplashActivity.java`: 啟動畫面Activity
     - `./UserClass.java`: 使用者Class
-    [!IMPORTANT] 
-    - MessageArrivedListener.java, MqttHandler.java, SharedViewModel.java, SplashActivity.java
-    - 皆不影響Class Diagram及Sequence Diagram
+      
+> [!IMPORTANT]
+> MessageArrivedListener.java, MqttHandler.java, SharedViewModel.java, SplashActivity.java皆不影響Class Diagram及Sequence Diagram
 
 - `./ui/`
   - `./ui/changeUserInfo/ChangeUserInfoFragment.java`: 更改使用者資訊
