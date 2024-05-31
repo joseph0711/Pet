@@ -38,6 +38,7 @@ public class FeedManualFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_feed_manual, container, false);
 
+        // Create a new FeedOperationsClass object.
         feedOperationsClass = new FeedOperationsClass();
 
         // Get the view model.

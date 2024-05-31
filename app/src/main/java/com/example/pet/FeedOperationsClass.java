@@ -18,10 +18,12 @@ public class FeedOperationsClass {
     private final MqttHandler mqttHandler;
     private Connection con;
     private boolean isDatabaseConnected = false;
+
     public FeedOperationsClass() {
         connectionMysqlClass = new ConnectionMysqlClass();
         mqttHandler = new MqttHandler();
     }
+
     public void connectMysql() {
         if (!isDatabaseConnected) {
             ExecutorService executionService = Executors.newSingleThreadExecutor();
@@ -47,10 +49,12 @@ public class FeedOperationsClass {
     public void feed(int id, String mode, int weight, String reservedDate, String reservedTime) throws JSONException {
         String sql = "INSERT INTO feeding (id, Mode, Weight, ReservedDate, ReservedTime, Created) VALUES (?, ?, ?, ?, ?, ?);";
 
+        // Get the current date and time
         Calendar calendar = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentDateString = dateFormat.format(calendar.getTime());
 
+        // Insert the data into the database
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
@@ -71,6 +75,7 @@ public class FeedOperationsClass {
             }
         });
 
+        // Check if the mode is Auto or Manual
         if (mode.equals("Auto")) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("feedingweight", weight);
