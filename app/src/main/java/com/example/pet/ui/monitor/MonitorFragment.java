@@ -1,5 +1,6 @@
 package com.example.pet.ui.monitor;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.example.pet.databinding.FragmentMonitorBinding;
 
 public class MonitorFragment extends Fragment {
     private FragmentMonitorBinding binding;
+    @SuppressLint("SetJavaScriptEnabled")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMonitorBinding.inflate(inflater, container, false);
