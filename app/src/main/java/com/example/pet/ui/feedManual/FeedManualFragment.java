@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import com.example.pet.FeedOperationsClass;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
+import com.example.pet.ui.feeding.FeedingFragment;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONException;
@@ -79,8 +81,8 @@ public class FeedManualFragment extends Fragment {
 
         // TODO: Fix the bug which caused the app to crash when the user clicked the Start button. (轉換到 FeedingFragment 造成的crush bug待處理
         // Might be due to the fragment transaction.
-//        Fragment fragment = new FeedingFragment();
-//        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-//        fragmentTransaction.replace(R.id.container, fragment).commit();
+       Fragment fragment = new FeedingFragment();
+        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container, fragment).commit();
     }
 }

@@ -21,7 +21,7 @@ import java.util.Objects;
 public class FeedingFragment extends Fragment {
     MqttHandler mqttHandler;
     public TextView textViewTitle;
-    private static final String BROKER_URL = "tcp://feeding_textTitle.mosquitto.org:1883";
+    private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
     private static final String CLIENT_ID = "test01";
     @SuppressLint({"MissingInflatedId", "SetTextI18n"})
     @Override
@@ -35,14 +35,15 @@ public class FeedingFragment extends Fragment {
         mqttHandler = new MqttHandler();
         mqttHandler.connect(BROKER_URL, CLIENT_ID);
 
-        // Subscribe to the topic "feed/weight"
+        // Subscribe to the topic "pet/feed/state"
         subscribeToTopic();
+
+        mqttHandler.setFeedingFragment(this);
         return view;
     }
 
     @SuppressLint("SetTextI18n")
     private void subscribeToTopic() {
-        Toast.makeText(this.getContext(), "Subscribing to topic " + "feed/weight", Toast.LENGTH_SHORT).show();
         mqttHandler.subscribe("pet/feed/state");
     }
 
@@ -50,7 +51,7 @@ public class FeedingFragment extends Fragment {
     public void updateTextView(String result) {
         //TODO: fix the bug which caused textview can't be modified by code.
         Log.i("INFO", "Executing updateTextView()");
-        Log.i("INFO", "result:" + result);
+        Log.i("INFO", "state: " + result);
         if (Objects.equals(result, "Success")) {
             textViewTitle.setText("Feeding Complete.");
         } else {

@@ -42,7 +42,7 @@ public class FeedFragment extends Fragment {
         binding = FragmentFeedBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        petImageView = root.findViewById(R.id.home_imgAvatarPet);
+        petImageView = root.findViewById(R.id.feed_imgAvatarPet);
 
         connectionMysqlClass = new ConnectionMysqlClass();
         connect(this::findPetAvatarById);
@@ -64,7 +64,7 @@ public class FeedFragment extends Fragment {
     }
 
     private void findPetAvatarById() {
-        String sql = "SELECT pet.Image as PetImage FROM user JOIN pet ON user.id = pet.id WHERE user.id = ?;";
+        String sql = "SELECT pet.PetImage as PetImage FROM user JOIN pet ON user.id = pet.id WHERE user.id = ?;";
 
         // Get the SharedViewModel instance
         SharedViewModel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
