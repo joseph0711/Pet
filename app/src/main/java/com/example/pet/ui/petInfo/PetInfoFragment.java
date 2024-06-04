@@ -138,14 +138,10 @@ public class PetInfoFragment extends Fragment {
 
         // Make a connection to MySQL.
         connectionMysqlClass = new ConnectionMysqlClass();
-        connect();
+        connectMysql();
 
         // Call the petInfoRegister() method when the Confirm button is clicked.
         btnConfirm = view.findViewById(R.id.petInfo_btnConfirm);
-
-        // Using viewmodel to catch the data from Register fragment.
-        sharedViewModel.getUserClass().observe(getViewLifecycleOwner(), item -> Log.i("viewmodel", item.getCreatedDateTime()));
-
         btnConfirm.setOnClickListener( view2 -> petInfoRegister());
         return view;
     }
@@ -184,10 +180,11 @@ public class PetInfoFragment extends Fragment {
 
         String petName, birthDate, gender;
         byte[] imageBytes;
-        int age, weight;
+        int age;
+        float weight;
         petName = petNameEditText.getText().toString();
         birthDate = userInputDate;
-        weight = Integer.parseInt(weightEditText.getText().toString());
+        weight = Float.parseFloat(weightEditText.getText().toString());
         gender = radioGenderButton.getText().toString();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             age = period.getYears();
@@ -201,7 +198,7 @@ public class PetInfoFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         imageBytes = outputStream.toByteArray();
 
-        String sql = "INSERT INTO pet (id, Name, Weight, Age, BirthDate, Gender, Image) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO pet (id, PetName, Weight, Age, BirthDate, Gender, PetImage) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
@@ -209,7 +206,7 @@ public class PetInfoFragment extends Fragment {
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setInt(1, userClass.id);
                 preparedStatement.setString(2, petName);
-                preparedStatement.setInt(3, weight);
+                preparedStatement.setFloat(3, weight);
                 preparedStatement.setInt(4, age);
                 preparedStatement.setString(5, birthDate);
                 preparedStatement.setString(6, gender);
@@ -234,7 +231,7 @@ public class PetInfoFragment extends Fragment {
     }
 
     private void findUserByCreated() {
-        String sql = "SELECT id FROM user WHERE Created = ?;";
+        String sql = "SELECT id FROM user WHERE AccountCreatedTime = ?;";
         String createdDateTime = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).createdDateTime;
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
@@ -253,7 +250,7 @@ public class PetInfoFragment extends Fragment {
         });
     }
 
-    public void connect() {
+    public void connectMysql() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
