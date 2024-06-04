@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) { // Login successful
-                    userClass.setName(resultSet.getString("Name"));
+                    userClass.setName(resultSet.getString("UserName"));
                     userClass.setId(resultSet.getInt("id"));
                     runOnUiThread(() -> {
                         // Store user's name and id in SharedPreferences
