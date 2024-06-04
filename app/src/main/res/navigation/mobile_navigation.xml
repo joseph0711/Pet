@@ -64,8 +64,8 @@
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/changeUserInfoFragment"
-        android:name="com.example.pet.ui.changeUserInfo.ChangeUserInfoFragment"
+        android:name="com.example.pet.ui.changePetInfo.ChangePetInfoFragment"
         android:label="fragment_change_user_info"
-        tools:layout="@layout/fragment_change_user_info" />
+        tools:layout="@layout/fragment_change_pet_info" />
 
 </navigation>
