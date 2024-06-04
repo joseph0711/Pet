@@ -33,8 +33,8 @@ import java.util.concurrent.Executors;
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     ConnectionMysqlClass connectionMysqlClass;
-    private ImageView userImageView;
-    private TextView userTextView;
+    private ImageView userImageView, petImageView;
+    private TextView userTextView, petNameTextView, petAgeTextView, petWeightTextView;
     int id;
     Connection con;
     String str, name;
@@ -62,17 +62,23 @@ public class HomeFragment extends Fragment {
         sharedViewModel.setUserClass(userClass);
 
         userImageView = root.findViewById(R.id.home_imgAvatarUser);
-
         userTextView = root.findViewById(R.id.home_textTitle);
+        petImageView = root.findViewById(R.id.home_imgAvatarPet);
+        petNameTextView = root.findViewById(R.id.home_petName);
+        petAgeTextView = root.findViewById(R.id.home_petAge);
+        petWeightTextView = root.findViewById(R.id.home_petWeight);
+
         userTextView.setText("Hello, " + name);
 
         connectionMysqlClass = new ConnectionMysqlClass();
-        connect(this::findUserById);
+        Log.e("debug msg", "id" + id);
+        connectMysql(this::findUserAvatarById);
+        connectMysql(this::findPetInfoById);
         return root;
     }
 
-    private void findUserById() {
-        String sql = "SELECT user.Image as UserImage FROM user JOIN pet ON user.id = pet.id WHERE user.id = ?;";
+    private void findUserAvatarById() {
+        String sql = "SELECT user.UserImage as UserImage FROM user JOIN pet ON user.id = pet.id WHERE user.id = ?;";
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
@@ -84,17 +90,14 @@ public class HomeFragment extends Fragment {
                 if (resultSet.next()) {
                     // Retrieve the image data.
                     byte[] userImageBytes = resultSet.getBytes("UserImage");
-                    //byte[] petImageBytes = resultSet.getBytes("PetImage");
 
                     // Convert the byte arrays to Bitmaps.
                     Bitmap userBitmap = BitmapFactory.decodeByteArray(userImageBytes, 0, userImageBytes.length);
-                    //Bitmap petBitmap = BitmapFactory.decodeByteArray(petImageBytes, 0, petImageBytes.length);
 
                     // Set the Bitmaps to ImageViews.
                     requireActivity().runOnUiThread(() -> {
-                        if (userImageView != null) {
+                        if (isAdded() && userImageView != null) {
                             userImageView.setImageBitmap(userBitmap);
-                            //petImageView.setImageBitmap(petBitmap);
                         }
                     });
                 }
@@ -104,7 +107,51 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void connect(Runnable onConnected) {
+    private void findPetInfoById() {
+        String sql = "SELECT pet.PetImage as PetImage, pet.PetName as PetName, pet.Age as Age, pet.Weight as Weight FROM pet WHERE pet.id = ?;";
+
+        ExecutorService executionService = Executors.newSingleThreadExecutor();
+        executionService.execute(() -> {
+            try {
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                preparedStatement.setInt(1, id);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    // Retrieve the image data and pet information.
+                    byte[] petImageBytes = resultSet.getBytes("PetImage");
+                    String petName = resultSet.getString("PetName");
+                    int petAge = resultSet.getInt("Age");
+                    float petWeight = resultSet.getFloat("Weight");
+
+                    // Convert the byte arrays to Bitmaps.
+                    Bitmap petBitmap = BitmapFactory.decodeByteArray(petImageBytes, 0, petImageBytes.length);
+
+                    // Set the values to the respective views.
+                    requireActivity().runOnUiThread(() -> {
+                        if (isAdded()) {
+                            if (petImageView != null) {
+                                petImageView.setImageBitmap(petBitmap);
+                            }
+                            if (petNameTextView != null) {
+                                petNameTextView.setText(petName);
+                            }
+                            if (petAgeTextView != null) {
+                                petAgeTextView.setText("Age: " + petAge + " years");
+                            }
+                            if (petWeightTextView != null) {
+                                petWeightTextView.setText("Weight: " + petWeight + " kg");
+                            }
+                        }
+                    });
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
+    private void connectMysql(Runnable onConnected) {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
@@ -115,7 +162,9 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(requireActivity(), str, Toast.LENGTH_SHORT).show();
                     });
                 } else {
-                    requireActivity().runOnUiThread(onConnected);
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(onConnected);
+                    }
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
