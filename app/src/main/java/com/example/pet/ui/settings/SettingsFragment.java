@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.pet.ui.changeUserInfo.ChangeUserInfoFragment;
+import com.example.pet.ui.changePetInfo.ChangePetInfoFragment;
 import com.example.pet.R;
 import com.example.pet.databinding.FragmentSettingsBinding;
 
@@ -26,7 +26,7 @@ public class SettingsFragment extends Fragment {
 
         Button btnModify = root.findViewById(R.id.settings_btnModify);
         btnModify.setOnClickListener(view -> {
-            Fragment fragment = new ChangeUserInfoFragment();
+            Fragment fragment = new ChangePetInfoFragment();
             FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.container, fragment).commit();
         });
