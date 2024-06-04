@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout6"
+    android:id="@+id/frameLayout9"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.petInfo.PetInfoFragment" >
+    tools:context=".ui.changePetInfo.ChangePetInfoFragment">
 
     <!-- ScrollView to make the page scrollable -->
     <ScrollView
@@ -27,11 +27,11 @@
 
             <!-- Title TextView -->
             <TextView
-                android:id="@+id/petInfo_textTitle"
+                android:id="@+id/changePetInfo_textTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Register Pet Infomation"
+                android:text="Modify Pet Information"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:textColor="@color/skin_text"
@@ -39,7 +39,7 @@
 
             <!-- CardView for Pet Avatar -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/petInfo_cardViewAvatar"
+                android:id="@+id/changePetInfo_cardViewAvatar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
@@ -53,7 +53,7 @@
                     android:padding="16dp" >
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/petInfo_cardView"
+                        android:id="@+id/changePetInfo_cardView"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:elevation="4dp"
@@ -63,7 +63,7 @@
                         android:layout_gravity="center">
 
                         <ImageView
-                            android:id="@+id/petInfo_imgAvatar"
+                            android:id="@+id/changePetInfo_imgAvatar"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
@@ -76,7 +76,7 @@
 
             <!-- CardView for Pet Information -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/petInfo_cardViewInfo"
+                android:id="@+id/changePetInfo_cardViewInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
@@ -90,7 +90,7 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/petInfo_textName"
+                        android:id="@+id/changePetInfo_textName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -99,7 +99,7 @@
                         android:textColor="@color/skin_text" />
 
                     <EditText
-                        android:id="@+id/petInfo_inputName"
+                        android:id="@+id/changePetInfo_inputName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -109,7 +109,7 @@
                         tools:ignore="SpeakableTextPresentCheck" />
 
                     <TextView
-                        android:id="@+id/petInfo_textGender"
+                        android:id="@+id/changePetInfo_textGender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -118,21 +118,21 @@
                         android:textColor="@color/skin_text" />
 
                     <RadioGroup
-                        android:id="@+id/petInfo_radioGenderGroup"
+                        android:id="@+id/changePetInfo_radioGenderGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="4dp">
 
                         <RadioButton
-                            android:id="@+id/petInfo_radioBtnFemale"
+                            android:id="@+id/changePetInfo_radioBtnFemale"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Female"
                             android:textColor="@color/skin_text" />
 
                         <RadioButton
-                            android:id="@+id/petInfo_radioBtnMale"
+                            android:id="@+id/changePetInfo_radioBtnMale"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Male"
@@ -140,7 +140,7 @@
                     </RadioGroup>
 
                     <TextView
-                        android:id="@+id/petInfo_textBirthDate"
+                        android:id="@+id/changePetInfo_textBirthDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -149,14 +149,14 @@
                         android:textColor="@color/skin_text" />
 
                     <Button
-                        android:id="@+id/petInfo_btnDatePicker"
+                        android:id="@+id/changePetInfo_btnDatePicker"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Date Picker" />
 
                     <TextView
-                        android:id="@+id/petInfo_textDatePicked"
+                        android:id="@+id/changePetInfo_textDatePicked"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -164,7 +164,7 @@
                         android:textColor="@color/skin_text" />
 
                     <TextView
-                        android:id="@+id/petInfo_textAge"
+                        android:id="@+id/changePetInfo_textAge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -172,7 +172,7 @@
                         android:textColor="@color/skin_text" />
 
                     <TextView
-                        android:id="@+id/petInfo_textWeight"
+                        android:id="@+id/changePetInfo_textWeight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -181,7 +181,7 @@
                         android:textColor="@color/skin_text" />
 
                     <EditText
-                        android:id="@+id/petInfo_inputWeight"
+                        android:id="@+id/changePetInfo_inputWeight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -193,7 +193,7 @@
             </androidx.cardview.widget.CardView>
             <!-- Confirm Button -->
             <Button
-                android:id="@+id/petInfo_btnConfirm"
+                android:id="@+id/changePetInfo_btnConfirm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -201,5 +201,4 @@
 
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
