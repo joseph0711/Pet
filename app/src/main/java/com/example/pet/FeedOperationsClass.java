@@ -36,6 +36,7 @@ public class FeedOperationsClass {
                         isDatabaseConnected = true;
                     }
                 } catch (Exception ex) {
+                    isDatabaseConnected = false; // Maintain invariant
                     throw new RuntimeException(ex);
                 }
             });
@@ -47,7 +48,15 @@ public class FeedOperationsClass {
     }
 
     public void feed(int id, String mode, int weight, String reservedDate, String reservedTime) throws JSONException {
-        String sql = "INSERT INTO feeding (id, Mode, Weight, ReservedDate, ReservedTime, Created) VALUES (?, ?, ?, ?, ?, ?);";
+        // Method invariant checks
+        if (id <= 0 || weight <= 0 || reservedDate == null || reservedTime == null || mode == null) {
+            throw new IllegalArgumentException("Invalid input parameters for feed method.");
+        }
+        if (!mode.equals("Auto") && !mode.equals("Manual")) {
+            throw new IllegalArgumentException("Mode must be 'Auto' or 'Manual'.");
+        }
+
+        String sql = "INSERT INTO feeding (id, Mode, FeedingWeight, ReservedDate, ReservedTime, SetUpTime) VALUES (?, ?, ?, ?, ?, ?);";
 
         // Get the current date and time
         Calendar calendar = Calendar.getInstance();
@@ -75,6 +84,8 @@ public class FeedOperationsClass {
             }
         });
 
+        String reservedTimeWithoutSeconds = reservedTime.substring(0, 5);
+
         // Check if the mode is Auto or Manual
         if (mode.equals("Auto")) {
             JSONObject jsonObject = new JSONObject();
@@ -83,6 +94,7 @@ public class FeedOperationsClass {
         } else if (mode.equals("Manual")) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("feedingweight", weight);
+            jsonObject.put("time", reservedTimeWithoutSeconds);
             mqttHandler.publish("pet/feed/weight", jsonObject);
         }
     }
