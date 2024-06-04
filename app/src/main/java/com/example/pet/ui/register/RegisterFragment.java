@@ -134,7 +134,7 @@ public class RegisterFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         imageBytes = outputStream.toByteArray();
 
-        String sql = "INSERT INTO user (Name, Email, Password, Created, Image) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO user (UserName, Email, Password, AccountCreatedTime, UserImage) VALUES (?, ?, ?, ?, ?);";
 
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
