@@ -41,6 +41,7 @@ dependencies {
     implementation ("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation ("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
     implementation ("com.google.code.gson:gson:2.8.6")
+    implementation ("io.noties.markwon:core:4.6.2")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
