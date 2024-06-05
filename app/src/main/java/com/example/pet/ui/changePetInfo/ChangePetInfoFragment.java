@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pet.ConnectionMysqlClass;
+import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
 import com.example.pet.ui.login.LoginActivity;
@@ -67,6 +68,7 @@ public class ChangePetInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_change_pet_info, container, false);
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
 
         // Get the view model.
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -240,5 +242,11 @@ public class ChangePetInfoFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 }

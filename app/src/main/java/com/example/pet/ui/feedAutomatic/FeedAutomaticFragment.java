@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.pet.FeedOperationsClass;
+import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
 
@@ -46,6 +47,7 @@ public class FeedAutomaticFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feed_automatic, container, false);
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
 
         // Get the view model.
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -113,5 +115,11 @@ public class FeedAutomaticFragment extends Fragment {
         int weight = Integer.parseInt(editTextAmount.getText().toString());
         int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
         feedOperationsClass.feed(id,"Auto", weight, reservedDate, reservedTime);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 }
