@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.pet.FeedOperationsClass;
+import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
 import com.example.pet.ui.feeding.FeedingFragment;
@@ -33,12 +33,12 @@ public class FeedManualFragment extends Fragment {
     private EditText editTextInputWeight;
     private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
     private static final String CLIENT_ID = "test01";
-
     @SuppressLint("MissingInflatedId")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_feed_manual, container, false);
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
 
         // Create a new FeedOperationsClass object.
         feedOperationsClass = new FeedOperationsClass();
@@ -84,5 +84,11 @@ public class FeedManualFragment extends Fragment {
        Fragment fragment = new FeedingFragment();
         FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, fragment).commit();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 }
