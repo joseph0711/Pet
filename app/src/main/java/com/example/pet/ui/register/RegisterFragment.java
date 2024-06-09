@@ -28,9 +28,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.pet.ConnectionMysqlClass;
+import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
 import com.example.pet.UserClass;
+import com.example.pet.ui.login.LoginActivity;
 import com.example.pet.ui.petInfo.PetInfoFragment;
 
 import java.io.ByteArrayOutputStream;
