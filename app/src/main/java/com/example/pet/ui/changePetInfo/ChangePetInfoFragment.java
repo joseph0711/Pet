@@ -212,14 +212,14 @@ public class ChangePetInfoFragment extends Fragment {
                 int rowCount = preparedStatement.executeUpdate();
                 if (rowCount > 0) {
                     requireActivity().runOnUiThread(() -> {
-                        // Registration successful
-                        Toast.makeText(requireActivity(), "Pet Registration successful", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                        // update successful
+                        Toast.makeText(requireActivity(), "Pet Info Updated!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(requireActivity(), MainActivity.class);
                         startActivity(intent);
                     });
                 } else {
-                    // Registration failed
-                    requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Pet Registration failed. Contact Developer!", Toast.LENGTH_SHORT).show());
+                    // update failed
+                    requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Pet Info Update Failed. Contact Developer!", Toast.LENGTH_SHORT).show());
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
