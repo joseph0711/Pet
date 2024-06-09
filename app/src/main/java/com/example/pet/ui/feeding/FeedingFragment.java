@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.pet.MainActivity;
 import com.example.pet.MqttHandler;
 import com.example.pet.R;
 
@@ -23,11 +23,11 @@ public class FeedingFragment extends Fragment {
     public TextView textViewTitle;
     private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
     private static final String CLIENT_ID = "test01";
-    @SuppressLint({"MissingInflatedId", "SetTextI18n"})
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_feeding, container, false);
+        View view = inflater.inflate(R.layout.fragment_feeding, container, false);
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
 
         textViewTitle = view.findViewById(R.id.feeding_textTitle);
 
@@ -52,10 +52,17 @@ public class FeedingFragment extends Fragment {
         //TODO: fix the bug which caused textview can't be modified by code.
         Log.i("INFO", "Executing updateTextView()");
         Log.i("INFO", "state: " + result);
+
         if (Objects.equals(result, "Success")) {
             textViewTitle.setText("Feeding Complete.");
         } else {
             textViewTitle.setText("Feeding Failed.");
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 }
