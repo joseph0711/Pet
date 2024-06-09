@@ -84,18 +84,15 @@ public class FeedOperationsClass {
             }
         });
 
-        String reservedTimeWithoutSeconds = reservedTime.substring(0, 5);
+        // Remove the seconds from the reserved time
+        String reservedTimeWithoutSeconds = reservedTime.substring(0, 5).replace(":", "");
+        int reservedTimeAsInteger = Integer.parseInt(reservedTimeWithoutSeconds);
 
-        // Check if the mode is Auto or Manual
-        if (mode.equals("Auto")) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("feedingweight", weight);
-            mqttHandler.publish("pet/feed/weight", jsonObject);
-        } else if (mode.equals("Manual")) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("feedingweight", weight);
-            jsonObject.put("time", reservedTimeWithoutSeconds);
-            mqttHandler.publish("pet/feed/weight", jsonObject);
-        }
+        // Publish the data to the MQTT broker
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("weight", weight);
+        jsonObject.put("time", reservedTimeAsInteger);
+        mqttHandler.publish("pet/feed/weight", jsonObject);
+
     }
 }
