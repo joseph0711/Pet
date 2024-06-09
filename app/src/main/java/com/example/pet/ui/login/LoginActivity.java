@@ -19,6 +19,7 @@ import com.example.pet.R;
 import com.example.pet.UserClass;
 import com.example.pet.databinding.ActivityLoginBinding;
 import com.example.pet.ui.register.RegisterFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
