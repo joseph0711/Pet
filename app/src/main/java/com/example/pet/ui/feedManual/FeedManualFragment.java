@@ -36,7 +36,6 @@ public class FeedManualFragment extends Fragment {
     @SuppressLint("MissingInflatedId")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_feed_manual, container, false);
         ((MainActivity) requireActivity()).hideBottomNavigationView();
 
@@ -79,8 +78,6 @@ public class FeedManualFragment extends Fragment {
 
         feedOperationsClass.feed(id,"Manual", weight, currentDate, currentTime);
 
-        // TODO: Fix the bug which caused the app to crash when the user clicked the Start button. (轉換到 FeedingFragment 造成的crush bug待處理
-        // Might be due to the fragment transaction.
        Fragment fragment = new FeedingFragment();
         FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, fragment).commit();
