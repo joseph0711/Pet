@@ -10,6 +10,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.pet.ui.login.LoginActivity;
+
 public class SplashActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     @Override
@@ -28,7 +30,7 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         public void run() {
             if (!isFinishing()) {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                 finish();
             }
         }
