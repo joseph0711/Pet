@@ -21,22 +21,40 @@
         android:id="@+id/navigation_feed"
         android:name="com.example.pet.ui.feed.FeedFragment"
         android:label="@string/title_feed"
-        tools:layout="@layout/fragment_feed" />
+        tools:layout="@layout/fragment_feed" >
+        <action
+            android:id="@+id/action_navigation_feed_to_feedManualFragment"
+            app:destination="@id/feedManualFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/navigation_healthcare"
         android:name="com.example.pet.ui.healthcare.HealthCareFragment"
         android:label="@string/title_HealthCare"
         tools:layout="@layout/fragment_health_care" />
+
     <fragment
         android:id="@+id/feedManualFragment"
         android:name="com.example.pet.ui.feedManual.FeedManualFragment"
         android:label="fragment_feed_manual"
-        tools:layout="@layout/fragment_feed_manual" />
+        tools:layout="@layout/fragment_feed_manual" >
+        <action
+            android:id="@+id/action_feedManualFragment_to_navigation_feed"
+            app:destination="@id/navigation_feed" />
+        <action
+            android:id="@+id/action_feedManualFragment_to_feedingFragment"
+            app:destination="@id/feedingFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/feedAutomaticFragment"
         android:name="com.example.pet.ui.feedAutomatic.FeedAutomaticFragment"
         android:label="fragment_feed_automatic"
-        tools:layout="@layout/fragment_feed_automatic" />
+        tools:layout="@layout/fragment_feed_automatic" >
+        <action
+            android:id="@+id/action_feedAutomaticFragment_to_navigation_feed"
+            app:destination="@id/navigation_feed" />
+    </fragment>
     <fragment
         android:id="@+id/feedingFragment"
         android:name="com.example.pet.ui.feeding.FeedingFragment"
@@ -46,12 +64,20 @@
         android:id="@+id/registerFragment"
         android:name="com.example.pet.ui.register.RegisterFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_petInfoFragment"
+            app:destination="@id/petInfoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/petInfoFragment"
         android:name="com.example.pet.ui.petInfo.PetInfoFragment"
         android:label="fragment_pet_info"
-        tools:layout="@layout/fragment_pet_info" />
+        tools:layout="@layout/fragment_pet_info" >
+        <action
+            android:id="@+id/action_petInfoFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
     <activity
         android:id="@+id/loginActivity"
         android:name="com.example.pet.ui.login.LoginActivity"
@@ -61,11 +87,28 @@
         android:id="@+id/navigation_settings"
         android:name="com.example.pet.ui.settings.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_navigation_settings_to_changeUserInfoFragment"
+            app:destination="@id/changeUserInfoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/changeUserInfoFragment"
         android:name="com.example.pet.ui.changePetInfo.ChangePetInfoFragment"
         android:label="fragment_change_user_info"
-        tools:layout="@layout/fragment_change_pet_info" />
+        tools:layout="@layout/fragment_change_pet_info" >
+        <action
+            android:id="@+id/action_changeUserInfoFragment_to_navigation_settings"
+            app:destination="@id/navigation_settings" />
+    </fragment>
+    <activity
+        android:id="@+id/splashActivity"
+        android:name="com.example.pet.SplashActivity"
+        android:label="activity_splash"
+        tools:layout="@layout/activity_splash" />
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.pet.MainActivity"
+        android:label="MainActivity" />
 
 </navigation>
