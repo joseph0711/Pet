@@ -2,11 +2,17 @@ package com.example.pet.ui.feedManual;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +24,7 @@ import com.example.pet.FeedOperationsClass;
 import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
+import com.example.pet.ui.feed.FeedFragment;
 import com.example.pet.ui.feeding.FeedingFragment;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -38,6 +45,17 @@ public class FeedManualFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feed_manual, container, false);
         ((MainActivity) requireActivity()).hideBottomNavigationView();
+
+        // Handle the back button event
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Use NavController to navigate back to FeedFragment
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                navController.navigate(R.id.navigation_feed);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
 
         // Create a new FeedOperationsClass object.
         feedOperationsClass = new FeedOperationsClass();
@@ -65,6 +83,12 @@ public class FeedManualFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        FeedFragment.progressDialog.dismiss();
+    }
+
     private void manualFeed() throws MqttException, JSONException {
         int weight = Integer.parseInt(editTextInputWeight.getText().toString());
         int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
@@ -78,9 +102,21 @@ public class FeedManualFragment extends Fragment {
 
         feedOperationsClass.feed(id,"Manual", weight, currentDate, currentTime);
 
-       Fragment fragment = new FeedingFragment();
+        Fragment fragment = new FeedingFragment();
         FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, fragment).commit();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 
     @Override
