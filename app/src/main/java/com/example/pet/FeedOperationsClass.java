@@ -47,7 +47,7 @@ public class FeedOperationsClass {
         mqttHandler.connect(brokerUrl, clientId);
     }
 
-    public void feed(int id, String mode, int weight, String reservedDate, String reservedTime) throws JSONException {
+    public void feed(int id, String mode, float weight, String reservedDate, String reservedTime) throws JSONException {
         // Method invariant checks
         if (id <= 0 || weight <= 0 || reservedDate == null || reservedTime == null || mode == null) {
             throw new IllegalArgumentException("Invalid input parameters for feed method.");
@@ -70,7 +70,7 @@ public class FeedOperationsClass {
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setInt(1, id);
                 preparedStatement.setString(2, mode);
-                preparedStatement.setInt(3, weight);
+                preparedStatement.setFloat(3, weight);
                 preparedStatement.setString(4, reservedDate);
                 preparedStatement.setString(5, reservedTime);
                 preparedStatement.setString(6, currentDateString);
