@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -19,11 +21,14 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,7 +41,6 @@ import com.example.pet.ConnectionMysqlClass;
 import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
-import com.example.pet.ui.login.LoginActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
@@ -50,6 +54,7 @@ import java.util.concurrent.Executors;
 
 public class ChangePetInfoFragment extends Fragment {
     private SharedViewModel sharedViewModel;
+    public static Dialog progressDialog;
     ConnectionMysqlClass connectionMysqlClass;
     Connection con;
     String str;
@@ -69,6 +74,23 @@ public class ChangePetInfoFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_change_pet_info, container, false);
         ((MainActivity) requireActivity()).hideBottomNavigationView();
+
+        // Initialize the Progress Bar Dialog
+        progressDialog = new Dialog(requireActivity());
+        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        progressDialog.setContentView(R.layout.dialog_progress);
+        progressDialog.setCancelable(false);
+
+        // Handle the back button event
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Use NavController to navigate back to FeedFragment
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                navController.navigate(R.id.navigation_settings);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
 
         // Get the view model.
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -140,7 +162,11 @@ public class ChangePetInfoFragment extends Fragment {
 
         // Call the petInfoUpdate() method when the Confirm button is clicked.
         btnConfirm = view.findViewById(R.id.changePetInfo_btnConfirm);
-        btnConfirm.setOnClickListener( view1 -> petInfoUpdate());
+        btnConfirm.setOnClickListener( view1 -> {
+            // Show the progress bar
+            progressDialog.show();
+            petInfoUpdate();
+        });
         return view;
     }
 
@@ -216,10 +242,12 @@ public class ChangePetInfoFragment extends Fragment {
                         Toast.makeText(requireActivity(), "Pet Info Updated!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(requireActivity(), MainActivity.class);
                         startActivity(intent);
+                        progressDialog.dismiss(); // Dismiss the progress dialog
                     });
                 } else {
                     // update failed
                     requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Pet Info Update Failed. Contact Developer!", Toast.LENGTH_SHORT).show());
+                    progressDialog.dismiss(); // Dismiss the progress dialog
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -242,6 +270,18 @@ public class ChangePetInfoFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 
     @Override
