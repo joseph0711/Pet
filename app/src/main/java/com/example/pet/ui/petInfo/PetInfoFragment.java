@@ -177,21 +177,36 @@ public class PetInfoFragment extends Fragment {
     }
 
     private void petInfoRegister() {
-        findUserByCreated(); // Find the user id by the created date and time.
-
         String petName, birthDate, gender;
         byte[] imageBytes;
         int age;
         float weight;
+
         petName = petNameEditText.getText().toString();
         birthDate = userInputDate;
         weight = Float.parseFloat(weightEditText.getText().toString());
         gender = radioGenderButton.getText().toString();
+
+        if (petName.isEmpty()) {
+            petNameEditText.setError("Pet name is required");
+            petNameEditText.requestFocus();
+            return;
+        }
+
+        if (weightEditText.getText().toString().isEmpty()) {
+            weightEditText.setError("Weight is required");
+            weightEditText.requestFocus();
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             age = period.getYears();
         } else {
             age = 0;
         }
+
+        // Find the user id by the created date and time.
+        findUserByCreated();
 
         // Convert the image to a byte array.
         Bitmap bitmap = ((BitmapDrawable) petInfoAvatar.getDrawable()).getBitmap();

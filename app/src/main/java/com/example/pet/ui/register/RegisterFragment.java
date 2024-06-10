@@ -121,14 +121,32 @@ public class RegisterFragment extends Fragment {
         String name, email, password, createdDateTime;
         byte[] imageBytes;
 
+        name = nameEditText.getText().toString();
+        email = emailEditText.getText().toString();
+        password = passwordEditText.getText().toString();
+
+        if (name.isEmpty()) {
+            nameEditText.setError("Name is required");
+            nameEditText.requestFocus();
+            return;
+        }
+
+        if (email.isEmpty()) {
+            emailEditText.setError("Email is required");
+            emailEditText.requestFocus();
+            return;
+        }
+
+        if (password.isEmpty()) {
+            passwordEditText.setError("Password is required");
+            passwordEditText.requestFocus();
+            return;
+        }
+
         // Get the current date and time and store it in the createdDateTime variable.
         Calendar calendar = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         createdDateTime = dateFormat.format(calendar.getTime());
-
-        name = nameEditText.getText().toString();
-        email = emailEditText.getText().toString();
-        password = passwordEditText.getText().toString();
 
         // Convert the image to a byte array.
         Bitmap bitmap = ((BitmapDrawable) registerAvatar.getDrawable()).getBitmap();
