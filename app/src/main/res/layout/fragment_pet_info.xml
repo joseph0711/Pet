@@ -185,7 +185,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:ems="10"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         android:backgroundTint="@color/skin_medium"
                         tools:ignore="SpeakableTextPresentCheck" />
                 </LinearLayout>
