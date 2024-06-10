@@ -1,6 +1,8 @@
 package com.example.pet.ui.home;
 
 import static android.content.Context.MODE_PRIVATE;
+
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -78,77 +80,116 @@ public class HomeFragment extends Fragment {
     }
 
     private void findUserAvatarById() {
-        String sql = "SELECT user.UserImage as UserImage FROM user JOIN pet ON user.id = pet.id WHERE user.id = ?;";
+        // Get the SharedViewModel instance
+        SharedViewModel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        ExecutorService executionService = Executors.newSingleThreadExecutor();
-        executionService.execute(() -> {
-            try {
-                PreparedStatement preparedStatement = con.prepareStatement(sql);
-                preparedStatement.setInt(1, id);
+        Bitmap userAvatar = sharedViewModel.getUserAvatar().getValue();
+        if (userAvatar != null) {
+            // User avatar is already available in the ViewModel, use it directly
+            userImageView.setImageBitmap(userAvatar);
+        } else {
+            // User avatar is not available in the ViewModel, read it from the database
+            String sql = "SELECT user.UserImage as UserImage FROM user JOIN pet ON user.id = pet.id WHERE user.id = ?;";
 
-                ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    // Retrieve the image data.
-                    byte[] userImageBytes = resultSet.getBytes("UserImage");
+            ExecutorService executionService = Executors.newSingleThreadExecutor();
+            executionService.execute(() -> {
+                try {
+                    PreparedStatement preparedStatement = con.prepareStatement(sql);
+                    preparedStatement.setInt(1, id);
 
-                    // Convert the byte arrays to Bitmaps.
-                    Bitmap userBitmap = BitmapFactory.decodeByteArray(userImageBytes, 0, userImageBytes.length);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        // Retrieve the image data.
+                        byte[] userImageBytes = resultSet.getBytes("UserImage");
 
-                    // Set the Bitmaps to ImageViews.
-                    requireActivity().runOnUiThread(() -> {
-                        if (isAdded() && userImageView != null) {
-                            userImageView.setImageBitmap(userBitmap);
+                        // Convert the byte arrays to Bitmaps.
+                        Bitmap userBitmap = BitmapFactory.decodeByteArray(userImageBytes, 0, userImageBytes.length);
+
+                        // Set the Bitmaps to ImageViews.
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                if (userImageView != null) {
+                                    userImageView.setImageBitmap(userBitmap);
+                                }
+                            });
+
+                            // Store the user avatar in the ViewModel for future use
+                            sharedViewModel.setUserAvatar(userBitmap);
                         }
-                    });
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
                 }
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+            });
+        }
     }
 
+    @SuppressLint("SetTextI18n")
     private void findPetInfoById() {
-        String sql = "SELECT pet.PetImage as PetImage, pet.PetName as PetName, pet.Age as Age, pet.Weight as Weight FROM pet WHERE pet.id = ?;";
+        // Get the SharedViewModel instance
+        SharedViewModel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        ExecutorService executionService = Executors.newSingleThreadExecutor();
-        executionService.execute(() -> {
-            try {
-                PreparedStatement preparedStatement = con.prepareStatement(sql);
-                preparedStatement.setInt(1, id);
+        Bitmap petAvatar = sharedViewModel.getPetAvatar().getValue();
+        final String[] petName = {sharedViewModel.getPetName().getValue()};
+        final Integer[] petAge = {sharedViewModel.getPetAge().getValue()};
+        final Float[] petWeight = {sharedViewModel.getPetWeight().getValue()};
 
-                ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    // Retrieve the image data and pet information.
-                    byte[] petImageBytes = resultSet.getBytes("PetImage");
-                    String petName = resultSet.getString("PetName");
-                    int petAge = resultSet.getInt("Age");
-                    float petWeight = resultSet.getFloat("Weight");
+        if (petAvatar != null && petName[0] != null && petAge[0] != null && petWeight[0] != null) {
+            // Pet information is already available in the ViewModel, use it directly
+            petImageView.setImageBitmap(petAvatar);
+            petNameTextView.setText(petName[0]);
+            petAgeTextView.setText("Age: " + petAge[0] + " years");
+            petWeightTextView.setText("Weight: " + petWeight[0] + " kg");
+        } else {
+            // Pet avatar is not available in the ViewModel, read it from the database
+            String sql = "SELECT pet.PetImage as PetImage, pet.PetName as PetName, pet.Age as Age, pet.Weight as Weight FROM pet WHERE pet.id = ?;";
 
-                    // Convert the byte arrays to Bitmaps.
-                    Bitmap petBitmap = BitmapFactory.decodeByteArray(petImageBytes, 0, petImageBytes.length);
+            ExecutorService executionService = Executors.newSingleThreadExecutor();
+            executionService.execute(() -> {
+                try {
+                    PreparedStatement preparedStatement = con.prepareStatement(sql);
+                    preparedStatement.setInt(1, id);
 
-                    // Set the values to the respective views.
-                    requireActivity().runOnUiThread(() -> {
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        // Retrieve the image data and pet information.
+                        byte[] petImageBytes = resultSet.getBytes("PetImage");
+                        petName[0] = resultSet.getString("PetName");
+                        petAge[0] = resultSet.getInt("Age");
+                        petWeight[0] = resultSet.getFloat("Weight");
+
+                        // Convert the byte arrays to Bitmaps.
+                        Bitmap petBitmap = BitmapFactory.decodeByteArray(petImageBytes, 0, petImageBytes.length);
+
+                        // Set the values to the respective views.
                         if (isAdded()) {
-                            if (petImageView != null) {
-                                petImageView.setImageBitmap(petBitmap);
-                            }
-                            if (petNameTextView != null) {
-                                petNameTextView.setText(petName);
-                            }
-                            if (petAgeTextView != null) {
-                                petAgeTextView.setText("Age: " + petAge + " years");
-                            }
-                            if (petWeightTextView != null) {
-                                petWeightTextView.setText("Weight: " + petWeight + " kg");
-                            }
+                            requireActivity().runOnUiThread(() -> {
+                                if (petImageView != null) {
+                                    petImageView.setImageBitmap(petBitmap);
+                                }
+                                if (petNameTextView != null) {
+                                    petNameTextView.setText(petName[0]);
+                                }
+                                if (petAgeTextView != null) {
+                                    petAgeTextView.setText("Age: " + petAge[0] + " years");
+                                }
+                                if (petWeightTextView != null) {
+                                    petWeightTextView.setText("Weight: " + petWeight[0] + " kg");
+                                }
+                            });
+
+                            // Store the pet avatar in the ViewModel for future use
+                            sharedViewModel.getPetAvatar().postValue(petBitmap);
+                            sharedViewModel.setPetName(petName[0]);
+                            sharedViewModel.setPetAge(petAge[0]);
+                            sharedViewModel.setPetWeight(petWeight[0]);
                         }
-                    });
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
                 }
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+            });
+        }
     }
 
     private void connectMysql(Runnable onConnected) {
