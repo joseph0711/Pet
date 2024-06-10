@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import java.util.Objects;
 public class FeedingFragment extends Fragment {
     MqttHandler mqttHandler;
     public TextView textViewTitle;
+    private Handler mainHandler;
     private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
     private static final String CLIENT_ID = "test01";
     @Override
@@ -38,7 +41,9 @@ public class FeedingFragment extends Fragment {
         // Subscribe to the topic "pet/feed/state"
         subscribeToTopic();
 
+        mainHandler = new Handler(Looper.getMainLooper());
         mqttHandler.setFeedingFragment(this);
+
         return view;
     }
 
@@ -49,15 +54,29 @@ public class FeedingFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void updateTextView(String result) {
-        //TODO: fix the bug which caused textview can't be modified by code.
-        Log.i("INFO", "Executing updateTextView()");
-        Log.i("INFO", "state: " + result);
-
-        if (Objects.equals(result, "Success")) {
-            textViewTitle.setText("Feeding Complete.");
-        } else {
-            textViewTitle.setText("Feeding Failed.");
+        if (mainHandler != null) {
+            mainHandler.post(() -> {
+                if (textViewTitle != null) {
+                    if (Objects.equals(result, "Success")) {
+                        textViewTitle.setText("Feeding Complete.");
+                    } else {
+                        textViewTitle.setText("Feeding Failed.");
+                    }
+                }
+            });
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) requireActivity()).hideBottomNavigationView();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity) requireActivity()).showBottomNavigationView();
     }
 
     @Override

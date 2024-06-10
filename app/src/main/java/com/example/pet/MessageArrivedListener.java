@@ -6,8 +6,14 @@ import com.example.pet.ui.feeding.FeedingFragment;
 
 public class MessageArrivedListener {
     public String result;
+    private FeedingFragment feedingFragment;
+
+    public MessageArrivedListener(FeedingFragment feedingFragment) {
+        this.feedingFragment = feedingFragment;
+    }
     public void messageArrived() {
-        FeedingFragment feedingFragment = new FeedingFragment();
-        feedingFragment.updateTextView(result);
+        if (feedingFragment != null) {
+            feedingFragment.updateTextView(result);
+        }
     }
 }

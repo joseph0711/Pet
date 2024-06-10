@@ -2,6 +2,8 @@ package com.example.pet;
 
 import android.util.Log;
 
+import com.example.pet.ui.feeding.FeedingFragment;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -14,6 +16,11 @@ import org.json.JSONObject;
 
 public class MqttHandler {
     private MqttClient client;
+    private FeedingFragment feedingFragment;
+
+    public void setFeedingFragment(FeedingFragment feedingFragment) {
+        this.feedingFragment = feedingFragment;
+    }
 
     public void connect(String brokerUrl, String clientId) {
         try {
@@ -64,11 +71,11 @@ public class MqttHandler {
                 }
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws JSONException {
-                    MessageArrivedListener listener = new MessageArrivedListener();
+                    MessageArrivedListener listener = new MessageArrivedListener(feedingFragment);
                     JSONObject jsonObject = new JSONObject(message.toString());
                     listener.result = jsonObject.getString("state");
-                    listener.messageArrived();
                     Log.i("INFO", "Message arrived: " + listener.result);
+                    listener.messageArrived();
                 }
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
