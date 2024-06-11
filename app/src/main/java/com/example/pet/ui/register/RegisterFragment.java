@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.net.Uri;
 import android.app.Activity;
 import android.Manifest;
@@ -125,18 +128,17 @@ public class RegisterFragment extends Fragment {
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
+        // Check if the user has entered the name, email, and password.
         if (name.isEmpty()) {
             nameEditText.setError("Name is required");
             nameEditText.requestFocus();
             return;
         }
-
         if (email.isEmpty()) {
             emailEditText.setError("Email is required");
             emailEditText.requestFocus();
             return;
         }
-
         if (password.isEmpty()) {
             passwordEditText.setError("Password is required");
             passwordEditText.requestFocus();
