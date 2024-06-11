@@ -34,7 +34,7 @@ public class MonitorFragment extends Fragment {
         webView.setScrollbarFadingEnabled(false);
         webView.setWebViewClient(new WebViewClient());
 
-        webView.loadUrl(['Monitor_URL']);
+        webView.loadUrl("http://20.205.139.170:1880/ui");
 
         return root;
     }
