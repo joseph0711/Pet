@@ -38,8 +38,8 @@ public class FeedManualFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private FeedOperationsClass feedOperationsClass;
     private EditText editTextInputWeight;
-    private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
-    private static final String CLIENT_ID = "test01";
+    private static final String BROKER_URL = ['BROKER_URL'];
+    private static final String CLIENT_ID = ['CLIENT_ID'];
     @SuppressLint("MissingInflatedId")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {

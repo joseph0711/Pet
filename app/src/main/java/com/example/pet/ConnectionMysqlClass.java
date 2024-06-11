@@ -10,11 +10,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ConnectionMysqlClass {
-    protected static String dp = "petassistant";
-    protected static String ip = "petassistant.mysql.database.azure.com";
-    protected static String port = "3306";
-    protected static String username = "pet";
-    protected static String password = "saGroup07";
+    protected static String dp = ["Database_Name"];
+    protected static String ip = ["Database_URL"];
+    protected static String port = ["Database_Port"];
+    protected static String username = ["Database_Username"];
+    protected static String password = ["Database_Password"];
 
     public Connection CONN() {
         Connection conn = null;
