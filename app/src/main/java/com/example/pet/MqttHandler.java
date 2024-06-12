@@ -17,6 +17,7 @@ import org.json.JSONObject;
 public class MqttHandler {
     private MqttClient client;
     private FeedingFragment feedingFragment;
+    private int failedMessageCount = 0;
 
     public void setFeedingFragment(FeedingFragment feedingFragment) {
         this.feedingFragment = feedingFragment;
@@ -73,9 +74,25 @@ public class MqttHandler {
                 public void messageArrived(String topic, MqttMessage message) throws JSONException {
                     MessageArrivedListener listener = new MessageArrivedListener(feedingFragment);
                     JSONObject jsonObject = new JSONObject(message.toString());
-                    listener.result = jsonObject.getString("state");
+                    String state = jsonObject.getString("state");
+                    if ("Failed".equals(state)) {
+                        failedMessageCount++;
+                        if (failedMessageCount > 20) {
+                            failedMessageCount = 0;
+                            listener.result = state;
+                            listener.messageArrived();
+                        }
+                    } else if ("Success".equals(state)) {
+                        if (failedMessageCount > 0 && failedMessageCount < 20) {
+                            failedMessageCount = 0;
+                            listener.result = state;
+                            listener.messageArrived();
+                        } else if (failedMessageCount == 0) {
+                            listener.result = state;
+                            listener.messageArrived();
+                        }
+                    }
                     Log.i("INFO", "Message arrived: " + listener.result);
-                    listener.messageArrived();
                 }
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
