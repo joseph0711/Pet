@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_navigation_feed_to_feedManualFragment"
             app:destination="@id/feedManualFragment" />
+        <action
+            android:id="@+id/action_navigation_feed_to_feedAutomaticFragment"
+            app:destination="@id/feedAutomaticFragment" />
     </fragment>
 
     <fragment
@@ -53,10 +56,14 @@
         tools:layout="@layout/fragment_feed_automatic" >
         <action
             android:id="@+id/action_feedAutomaticFragment_to_navigation_feed"
-            app:destination="@id/navigation_feed" />
+            app:destination="@id/navigation_feed"
+            app:popUpTo="@id/feedAutomaticFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_feedAutomaticFragment_to_feedingFragment"
-            app:destination="@id/feedingFragment" />
+            app:destination="@id/feedingFragment"
+            app:popUpTo="@id/feedAutomaticFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/feedingFragment"
