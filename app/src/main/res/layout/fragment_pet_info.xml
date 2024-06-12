@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Register Pet Infomation"
+                android:text="Register Pet Information"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:textColor="@color/skin_text"
