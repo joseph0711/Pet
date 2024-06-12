@@ -4,28 +4,19 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
-import android.net.Uri;
-import android.app.Activity;
-import android.Manifest;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import android.provider.MediaStore;
 import android.util.Log;
@@ -39,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.pet.ConnectionMysqlClass;
-import com.example.pet.MainActivity;
 import com.example.pet.R;
 import com.example.pet.SharedViewModel;
 import com.example.pet.UserClass;
@@ -47,11 +37,11 @@ import com.example.pet.ui.login.LoginActivity;
 import com.example.pet.ui.petInfo.PetInfoFragment;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -97,15 +87,30 @@ public class RegisterFragment extends Fragment {
                 requireActivity(),
                 new ViewModelProvider.NewInstanceFactory()).get(SharedViewModel.class);
 
+        // Registers a photo picker activity launcher in single-select mode.
+        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    if (uri != null) {
+                        Log.d("PhotoPicker", "Selected URI: " + uri);
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+                            registerAvatar.setImageBitmap(bitmap);
+                            isImageSelected = true;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+
         // Call the photo picker when user clicks on the avatar.
         registerAvatar = view.findViewById(R.id.register_imgAvatar);
         registerAvatar.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Pick Image", Toast.LENGTH_SHORT).show();
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                pickImage();
-            } else {
-                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
         });
 
         nameEditText = view.findViewById(R.id.register_inputName);
@@ -125,36 +130,6 @@ public class RegisterFragment extends Fragment {
         // Call the sendDataToMySQL() method when the Submit button is clicked.
         btnSubmit.setOnClickListener(v -> register());
         return view;
-    }
-
-    // Request permission to pick image from gallery.
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Check for permission to read external storage.
-        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-            if (isGranted) {
-                pickImage();
-            } else {
-                Toast.makeText(requireContext(), "Permission required to pick image", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Initialize the ActivityResultLauncher instance for handling the result of an activity that is started for a result.
-        resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Uri imageUri = result.getData().getData();
-                registerAvatar.setImageURI(imageUri);
-                isImageSelected = true;
-            }
-        });
-    }
-
-    // Pick image from gallery.
-    private void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        resultLauncher.launch(intent);
     }
 
     // Register the user.
