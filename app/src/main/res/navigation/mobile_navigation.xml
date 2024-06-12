@@ -54,12 +54,19 @@
         <action
             android:id="@+id/action_feedAutomaticFragment_to_navigation_feed"
             app:destination="@id/navigation_feed" />
+        <action
+            android:id="@+id/action_feedAutomaticFragment_to_feedingFragment"
+            app:destination="@id/feedingFragment" />
     </fragment>
     <fragment
         android:id="@+id/feedingFragment"
         android:name="com.example.pet.ui.feeding.FeedingFragment"
         android:label="fragment_feeding"
-        tools:layout="@layout/fragment_feeding" />
+        tools:layout="@layout/fragment_feeding" >
+        <action
+            android:id="@+id/action_feedingFragment_to_navigation_feed"
+            app:destination="@id/navigation_feed" />
+    </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.pet.ui.register.RegisterFragment"
