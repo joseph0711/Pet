@@ -33,6 +33,8 @@ import org.json.JSONException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FeedManualFragment extends Fragment {
     private SharedViewModel sharedViewModel;
@@ -90,7 +92,20 @@ public class FeedManualFragment extends Fragment {
     }
 
     private void manualFeed() throws MqttException, JSONException {
-        int weight = Integer.parseInt(editTextInputWeight.getText().toString());
+        // Validate the weight input is not empty.
+        String weightString = editTextInputWeight.getText().toString();
+        if (weightString.isEmpty()) {
+            editTextInputWeight.setError("Weight is required");
+            editTextInputWeight.requestFocus();
+            return;
+        }
+        // Validate the weight format.
+        if (!isValidWeight(weightString)) {
+            editTextInputWeight.setError("Invalid weight format. Weight should be an integer between 10 and 300");
+            editTextInputWeight.requestFocus();
+            return;
+        }
+        int weight = Integer.parseInt(weightString);
         int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
 
         // Set date and time to currentDateString, currentDate and currentTime.
@@ -102,9 +117,22 @@ public class FeedManualFragment extends Fragment {
 
         feedOperationsClass.feed(id,"Manual", weight, currentDate, currentTime);
 
-        Fragment fragment = new FeedingFragment();
-        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, fragment).commit();
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+        navController.navigate(R.id.feedingFragment);
+    }
+
+    private boolean isValidWeight(String weight) {
+        String integerRegex = "\\b([1-9][0-9]|1[0-9]{2}|2[0-9]{2}|300)\\b";
+        Pattern integerPattern = Pattern.compile(integerRegex);
+        Matcher integerMatcher = integerPattern.matcher(weight);
+
+        if (integerMatcher.matches()) {
+            // If the weight is an integer between 10 and 300, return true.
+            return true;
+        } else {
+            // If the weight doesn't match the regex, return false.
+            return false;
+        }
     }
 
     @Override

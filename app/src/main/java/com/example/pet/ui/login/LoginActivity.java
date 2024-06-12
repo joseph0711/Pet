@@ -1,5 +1,6 @@
 package com.example.pet.ui.login;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -31,6 +32,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
@@ -48,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -81,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         connectionMysqlClass = new ConnectionMysqlClass();
-        connect();
+        connectMySql();
 
 
         // Initialize the Progress Bar Dialog
@@ -100,12 +104,21 @@ public class LoginActivity extends AppCompatActivity {
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
+        // Validate the email input is not empty.
         if (email.isEmpty()) {
             emailEditText.setError("Email is required");
             emailEditText.requestFocus();
             return;
         }
 
+        // Validate the email format.
+        if (!isValidEmail(email)) {
+            emailEditText.setError("Invalid email format");
+            emailEditText.requestFocus();
+            return;
+        }
+
+        // Validate the password input is not empty.
         if (password.isEmpty()) {
             passwordEditText.setError("Password is required");
             passwordEditText.requestFocus();
@@ -165,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void connect() {
+    public void connectMySql() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
@@ -181,5 +194,12 @@ public class LoginActivity extends AppCompatActivity {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+        Pattern pattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }

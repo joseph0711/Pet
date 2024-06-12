@@ -3,7 +3,9 @@ package com.example.pet.ui.petInfo;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -25,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,6 +54,8 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PetInfoFragment extends Fragment {
     private SharedViewModel sharedViewModel;
@@ -67,11 +73,40 @@ public class PetInfoFragment extends Fragment {
     Period period;
     ActivityResultLauncher<Intent> resultLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    public static Dialog progressDialog;
+    private boolean isImageSelected = false;
+    private RadioGroup radioGenderGroup;
+    private View view;
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_pet_info, container, false);
+        view = inflater.inflate(R.layout.fragment_pet_info, container, false);
+
+        // Handle the back button event
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Discard registration?")
+                        .setMessage("Are you sure you want to discard your registration?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Use NavController to navigate back to FeedFragment
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivity(intent);
+                            requireActivity().finish();
+                        })
+                        .setNegativeButton("No", null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
+        // Initialize the Progress Bar Dialog
+        progressDialog = new Dialog(requireActivity());
+        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        progressDialog.setContentView(R.layout.dialog_progress);
+        progressDialog.setCancelable(false);
 
         // Get the view model.
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -88,7 +123,7 @@ public class PetInfoFragment extends Fragment {
         });
 
         // Get the value from the radio button in radio group.
-        RadioGroup radioGenderGroup = view.findViewById(R.id.petInfo_radioGenderGroup);
+        radioGenderGroup = view.findViewById(R.id.petInfo_radioGenderGroup);
         radioGenderGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             if (i == R.id.petInfo_radioBtnMale) {
                 radioGenderButton = view.findViewById(R.id.petInfo_radioBtnMale);
@@ -131,6 +166,8 @@ public class PetInfoFragment extends Fragment {
                     textAge.setText("Pet's age: " + period.getYears());
                 }
             }, year, month, day);
+            // Set the maximum date to the current date.
+            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
             datePickerDialog.show();
         });
 
@@ -166,6 +203,7 @@ public class PetInfoFragment extends Fragment {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Uri imageUri = result.getData().getData();
                 petInfoAvatar.setImageURI(imageUri);
+                isImageSelected = true;
             }
         });
     }
@@ -177,25 +215,54 @@ public class PetInfoFragment extends Fragment {
     }
 
     private void petInfoRegister() {
-        String petName, birthDate, gender;
+        String petName, birthDate;
         byte[] imageBytes;
         int age;
-        float weight;
 
         petName = petNameEditText.getText().toString();
         birthDate = userInputDate;
-        weight = Float.parseFloat(weightEditText.getText().toString());
-        gender = radioGenderButton.getText().toString();
 
+        // Validate the pet name input is not empty.
         if (petName.isEmpty()) {
             petNameEditText.setError("Pet name is required");
             petNameEditText.requestFocus();
             return;
         }
 
-        if (weightEditText.getText().toString().isEmpty()) {
+        // Validate the weight input is not empty.
+        String weightString = weightEditText.getText().toString();
+        if (weightString.isEmpty()) {
             weightEditText.setError("Weight is required");
             weightEditText.requestFocus();
+            return;
+        }
+        // Validate the weight format.
+        if (!isValidWeight(weightString)) {
+            weightEditText.setError("Invalid weight format. Only one decimal place is allowed");
+            weightEditText.requestFocus();
+            return;
+        }
+        float weight = Float.parseFloat(weightString);
+
+        // Validate the gender radio input is not empty.
+        int selectedId = radioGenderGroup.getCheckedRadioButtonId();
+        if (selectedId == -1) {
+            Toast.makeText(requireContext(), "Gender is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        radioGenderButton = view.findViewById(selectedId);
+        String gender = radioGenderButton.getText().toString();
+
+        // Validate the birth date input is not empty.
+        if (textDatePicked.getText().toString().isEmpty()) {
+            Toast.makeText(requireContext(), "Birth Date is required", Toast.LENGTH_SHORT).show();
+            btnDatePicker.requestFocus();
+            return;
+        }
+
+        // Validate the image is selected.
+        if (!isImageSelected) {
+            Toast.makeText(requireContext(), "Image is required", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -205,13 +272,16 @@ public class PetInfoFragment extends Fragment {
             age = 0;
         }
 
+        // Show the progress dialog
+        progressDialog.show();
+
         // Find the user id by the created date and time.
         findUserByCreated();
 
         // Convert the image to a byte array.
         Bitmap bitmap = ((BitmapDrawable) petInfoAvatar.getDrawable()).getBitmap();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
         imageBytes = outputStream.toByteArray();
 
         String sql = "INSERT INTO pet (id, PetName, Weight, Age, BirthDate, Gender, PetImage) VALUES (?, ?, ?, ?, ?, ?, ?);";
@@ -229,18 +299,23 @@ public class PetInfoFragment extends Fragment {
                 preparedStatement.setBytes(7, imageBytes);
 
                 int rowCount = preparedStatement.executeUpdate();
-                if (rowCount > 0) {
-                    requireActivity().runOnUiThread(() -> {
+                requireActivity().runOnUiThread(() -> {
+                    // Dismiss the progress dialog
+                    progressDialog.dismiss();
+
+                    if (rowCount > 0) {
                         // Registration successful
                         Toast.makeText(requireActivity(), "Pet Registration successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(requireActivity(), LoginActivity.class);
                         startActivity(intent);
-                    });
-                } else {
-                    // Registration failed
-                    requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "Pet Registration failed. Contact Developer!", Toast.LENGTH_SHORT).show());
-                }
+                    } else {
+                        // Registration failed
+                        Toast.makeText(requireActivity(), "Pet Registration failed. Contact Developer!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } catch (Exception ex) {
+                // Dismiss the progress dialog in case of an exception
+                requireActivity().runOnUiThread(() -> progressDialog.dismiss());
                 throw new RuntimeException(ex);
             }
         });
@@ -281,5 +356,26 @@ public class PetInfoFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    private boolean isValidWeight(String weight) {
+        String integerRegex = "^[1-9][0-9]?$|^100$";
+        String floatRegex = "^(100\\.0|[1-9][0-9]?\\.\\d|0\\.\\d)$";
+        Pattern integerPattern = Pattern.compile(integerRegex);
+        Pattern floatPattern = Pattern.compile(floatRegex);
+        Matcher integerMatcher = integerPattern.matcher(weight);
+        Matcher floatMatcher = floatPattern.matcher(weight);
+
+        if (integerMatcher.matches()) {
+            // If the weight is an integer, format it to have one decimal place.
+            weightEditText.setText(weight + ".0");
+            return true;
+        } else if (floatMatcher.matches()) {
+            // If the weight is a float with one decimal place, return true.
+            return true;
+        } else {
+            // If the weight doesn't match either regex, return false.
+            return false;
+        }
     }
 }

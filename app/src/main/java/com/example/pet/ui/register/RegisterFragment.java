@@ -1,6 +1,8 @@
 package com.example.pet.ui.register;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -13,6 +15,7 @@ import android.app.Activity;
 import android.Manifest;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -21,10 +24,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,8 +51,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterFragment extends Fragment {
     ConnectionMysqlClass connectionMysqlClass;
@@ -55,11 +66,31 @@ public class RegisterFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     ActivityResultLauncher<Intent> resultLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
-
+    public static Dialog progressDialog;
+    private boolean isImageSelected = false;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
+
+        // Handle the back button event
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Discard registration?")
+                        .setMessage("Are you sure you want to discard your registration?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Use NavController to navigate back to FeedFragment
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivity(intent);
+                            requireActivity().finish();
+                        })
+                        .setNegativeButton("No", null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
 
         // Get the view model.
         sharedViewModel = new ViewModelProvider(
@@ -83,7 +114,13 @@ public class RegisterFragment extends Fragment {
         Button btnSubmit = view.findViewById(R.id.register_btnContinue);
 
         connectionMysqlClass = new ConnectionMysqlClass();
-        connect();
+        connectMySql();
+
+        // Initialize the Progress Bar Dialog
+        progressDialog = new Dialog(requireActivity());
+        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        progressDialog.setContentView(R.layout.dialog_progress);
+        progressDialog.setCancelable(false);
 
         // Call the sendDataToMySQL() method when the Submit button is clicked.
         btnSubmit.setOnClickListener(v -> register());
@@ -109,6 +146,7 @@ public class RegisterFragment extends Fragment {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Uri imageUri = result.getData().getData();
                 registerAvatar.setImageURI(imageUri);
+                isImageSelected = true;
             }
         });
     }
@@ -128,22 +166,42 @@ public class RegisterFragment extends Fragment {
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
-        // Check if the user has entered the name, email, and password.
+        // Validate the name input is not empty.
         if (name.isEmpty()) {
             nameEditText.setError("Name is required");
             nameEditText.requestFocus();
             return;
         }
+
+        // Validate the email input is not empty.
         if (email.isEmpty()) {
             emailEditText.setError("Email is required");
             emailEditText.requestFocus();
             return;
         }
+
+        // Validate the email format.
+        if (!isValidEmail(email)) {
+            emailEditText.setError("Invalid email format");
+            emailEditText.requestFocus();
+            return;
+        }
+
+        // Validate the password input is not empty.
         if (password.isEmpty()) {
             passwordEditText.setError("Password is required");
             passwordEditText.requestFocus();
             return;
         }
+
+        // Validate the image is selected.
+        if (!isImageSelected) {
+            Toast.makeText(requireContext(), "Image is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show the progress dialog
+        progressDialog.show();
 
         // Get the current date and time and store it in the createdDateTime variable.
         Calendar calendar = Calendar.getInstance();
@@ -153,7 +211,7 @@ public class RegisterFragment extends Fragment {
         // Convert the image to a byte array.
         Bitmap bitmap = ((BitmapDrawable) registerAvatar.getDrawable()).getBitmap();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
         imageBytes = outputStream.toByteArray();
 
         String sql = "INSERT INTO user (UserName, Email, Password, AccountCreatedTime, UserImage) VALUES (?, ?, ?, ?, ?);";
@@ -169,19 +227,24 @@ public class RegisterFragment extends Fragment {
                 preparedStatement.setBytes(5, imageBytes);
 
                 int rowCount = preparedStatement.executeUpdate();
-                if (rowCount > 0) {
-                    // User Registration Successful
-                    requireActivity().runOnUiThread(() -> {
+                requireActivity().runOnUiThread(() -> {
+                    // Dismiss the progress dialog
+                    progressDialog.dismiss();
+
+                    if (rowCount > 0) {
+                        // User Registration Successful
                         Toast.makeText(requireActivity(), "User Register Successfully", Toast.LENGTH_SHORT).show();
                         Fragment fragment = new PetInfoFragment();
                         FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
                         fragmentTransaction.replace(R.id.container, fragment).commit();
-                    });
-                } else {
-                    // User Registration failed
-                    requireActivity().runOnUiThread(() -> Toast.makeText(requireActivity(), "User Register Failed. Contact Developer!", Toast.LENGTH_SHORT).show());
-                }
+                    } else {
+                        // User Registration failed
+                        Toast.makeText(requireActivity(), "User Register Failed. Contact Developer!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } catch (Exception ex) {
+                // Dismiss the progress dialog in case of an exception
+                requireActivity().runOnUiThread(() -> progressDialog.dismiss());
                 throw new RuntimeException(ex);
             }
         });
@@ -195,7 +258,7 @@ public class RegisterFragment extends Fragment {
     }
 
     // Connect to the MySQL database.
-    private void connect() {
+    private void connectMySql() {
         ExecutorService executionService = Executors.newSingleThreadExecutor();
         executionService.execute(() -> {
             try {
@@ -210,5 +273,12 @@ public class RegisterFragment extends Fragment {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+        Pattern pattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }

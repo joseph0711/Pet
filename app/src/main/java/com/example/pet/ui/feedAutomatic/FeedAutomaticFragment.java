@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.pet.FeedOperationsClass;
 import com.example.pet.MainActivity;
@@ -33,6 +34,8 @@ import org.json.JSONException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FeedAutomaticFragment extends Fragment {
     private SharedViewModel sharedViewModel;
@@ -68,8 +71,11 @@ public class FeedAutomaticFragment extends Fragment {
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         // Set the date picker for the Date.
+        // Calendar instance to store the selected date.
+        Calendar selectedDate = Calendar.getInstance();
         Button btnDateDialog = view.findViewById(R.id.feedAuto_btnDate);
         textViewDate = view.findViewById(R.id.feedAuto_textDatePicked);
+
         btnDateDialog.setOnClickListener(view1 -> {
             Calendar calendar = Calendar.getInstance();
             day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -80,7 +86,17 @@ public class FeedAutomaticFragment extends Fragment {
                 month += 1;
                 reservedDate = year + "-" + month + "-" + dayOfMonth;
                 textViewDate.setText("Date: " + reservedDate);
+
+                // Store the selected date in the selectedDate Calendar instance.
+                selectedDate.set(year, month - 1, dayOfMonth);
             }, year, month, day);
+
+            // Set the minimum date to the current date.
+            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+
+            // Set the maximum date to 7 days after the current date.
+            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
+
             datePickerDialog.show();
         });
 
@@ -93,10 +109,21 @@ public class FeedAutomaticFragment extends Fragment {
                 @SuppressLint("SimpleDateFormat")
                 @Override
                 public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                    calendar.set(Calendar.HOUR_OF_DAY, hour);
-                    calendar.set(Calendar.MINUTE, minute);
-                    reservedTime = new SimpleDateFormat("HH:mm").format(calendar.getTime());
-                    textViewTime.setText(reservedTime);
+                    // Compare the selected date with the current date.
+                    Calendar currentDate = Calendar.getInstance();
+                    if (selectedDate.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR) &&
+                            selectedDate.get(Calendar.DAY_OF_YEAR) == currentDate.get(Calendar.DAY_OF_YEAR) &&
+                            (hour < currentDate.get(Calendar.HOUR_OF_DAY) ||
+                                    (hour == currentDate.get(Calendar.HOUR_OF_DAY) && minute < currentDate.get(Calendar.MINUTE)))) {
+                        // If the selected date is the current date and the selected time is earlier than the current time, show a message.
+                        Toast.makeText(getActivity(), "The time should be later than now.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // If the selected date is a future date or the selected time is later than the current time, set the reserved time.
+                        calendar.set(Calendar.HOUR_OF_DAY, hour);
+                        calendar.set(Calendar.MINUTE, minute);
+                        reservedTime = new SimpleDateFormat("HH:mm").format(calendar.getTime());
+                        textViewTime.setText(reservedTime);
+                    }
                 }
             };
             TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
@@ -133,9 +160,53 @@ public class FeedAutomaticFragment extends Fragment {
     }
 
     private void autoFeed() throws JSONException {
-        int weight = Integer.parseInt(editTextAmount.getText().toString());
+        // Validate the weight input is not empty.
+        String weightString = editTextAmount.getText().toString();
+        if (weightString.isEmpty()) {
+            editTextAmount.setError("Weight is required");
+            editTextAmount.requestFocus();
+            return;
+        }
+        // Validate the weight format.
+        if (!isValidWeight(weightString)) {
+            editTextAmount.setError("Invalid weight format. Weight should be an integer between 10 and 300");
+            editTextAmount.requestFocus();
+            return;
+        }
+        int weight = Integer.parseInt(weightString);
+
+        // Validate the date input is not empty.
+        if (reservedDate == null || reservedDate.isEmpty()) {
+            Toast.makeText(getActivity(), "Date is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate the time input is not empty.
+        if (reservedTime == null || reservedTime.isEmpty()) {
+            Toast.makeText(getActivity(), "Time is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         int id = Objects.requireNonNull(sharedViewModel.getUserClass().getValue()).id;
         feedOperationsClass.feed(id,"Auto", weight, reservedDate, reservedTime);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+        Bundle bundle = new Bundle();
+        bundle.putString("message", "Reserved Successfully!");
+        navController.navigate(R.id.feedingFragment, bundle);
+    }
+
+    private boolean isValidWeight(String weight) {
+        String integerRegex = "\\b([1-9][0-9]|1[0-9]{2}|2[0-9]{2}|300)\\b";
+        Pattern integerPattern = Pattern.compile(integerRegex);
+        Matcher integerMatcher = integerPattern.matcher(weight);
+
+        if (integerMatcher.matches()) {
+            // If the weight is an integer between 10 and 300, return true.
+            return true;
+        } else {
+            // If the weight doesn't match the regex, return false.
+            return false;
+        }
     }
 
     @Override
