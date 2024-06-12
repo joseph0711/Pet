@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pet</string>
+    <string name="app_name">Pet Smart Assistant</string>
     <string name="title_home">Home</string>
     <string name="title_monitor">Monitor</string>
     <string name="title_feed">Feed</string>
