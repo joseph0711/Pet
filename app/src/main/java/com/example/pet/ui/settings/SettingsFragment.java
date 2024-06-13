@@ -8,7 +8,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -18,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.pet.MainActivity;
-import com.example.pet.ui.changePetInfo.ChangePetInfoFragment;
 import com.example.pet.R;
 import com.example.pet.databinding.FragmentSettingsBinding;
 import com.example.pet.ui.login.LoginActivity;

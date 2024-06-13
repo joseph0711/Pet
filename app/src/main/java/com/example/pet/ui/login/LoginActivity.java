@@ -10,13 +10,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.pet.ConnectionMysqlClass;
@@ -25,7 +23,6 @@ import com.example.pet.R;
 import com.example.pet.UserClass;
 import com.example.pet.databinding.ActivityLoginBinding;
 import com.example.pet.ui.register.RegisterFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

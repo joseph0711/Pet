@@ -67,8 +67,6 @@ public class ChangePetInfoFragment extends Fragment {
     int day, month, year;
     String userInputDate;
     Period period;
-    ActivityResultLauncher<Intent> resultLauncher;
-    private ActivityResultLauncher<String> requestPermissionLauncher;
     private boolean isImageSelected = false;
     private RadioGroup radioGenderGroup;
     private View view;
