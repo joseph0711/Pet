@@ -48,8 +48,8 @@ public class FeedAutomaticFragment extends Fragment {
     int day, month, year;
     String reservedTime, reservedDate;
     private FeedOperationsClass feedOperationsClass;
-    private static final String BROKER_URL = "tcp://test.mosquitto.org:1883";
-    private static final String CLIENT_ID = "test01";
+    private static final String BROKER_URL = ["BROKER_URL"];
+    private static final String CLIENT_ID = ["CLIENT_ID"];
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
